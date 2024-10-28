@@ -1,0 +1,33 @@
+services:
+  jupyter:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    restart: unless-stopped
+    environment:
+      PYTHONPATH: /workspace
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    network_mode: service:db
+
+  prism:
+    image: stoplight/prism:latest
+    restart: unless-stopped
+    command: mock -h 0.0.0.0 /workspace/openapi.yaml
+    network_mode: service:db
+    volumes:
+      - ..:/workspace:cached
+
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+
+volumes:
+  postgres-data:
