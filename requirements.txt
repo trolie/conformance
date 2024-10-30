@@ -1,3 +1,5 @@
 pytest-bdd==7.3.0
 pytest-env
 pytz
+pre-commit
+ruff
