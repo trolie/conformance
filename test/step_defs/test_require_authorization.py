@@ -39,8 +39,40 @@ def test_historical_snapshot_authorization():
     pass
 
 
+@pytest.mark.Forecasting
+@scenario(
+    "require_authorization.feature",
+    "Get Regional Forecast Limits Snapshot requires authorization",
+)
+def test_regional_snapshot_authorization():
+    pass
+
+
+@pytest.mark.Forecasting
+@scenario(
+    "require_authorization.feature",
+    "Updating the Regional Forecast Limits Snapshot requires authorization",
+)
+def test_regional_forecast_proposal_authorization():
+    pass
+
+
+@pytest.mark.Forecasting
+@scenario(
+    "require_authorization.feature",
+    "Submitting a Forecast Proposal requires authorization",
+)
+def test_forecast_proposal_authorization():
+    pass
+
+
 @given("a TROLIE client that has not been authorized", target_fixture="auth_token")
 def client_not_authorized():
+    return None
+
+
+@given("an empty body and no Content-Type specified")
+def empty_body():
     return None
 
 
@@ -58,6 +90,26 @@ def request_forecast_limits_snapshot():
 )
 def request_historical_forecast_limits_snapshot():
     return trolie_request(f"/limits/forecast-snapshot/{get_period(-1)}")
+
+
+@when(
+    "the client requests a Regional Forecast Limits Snapshot",
+    target_fixture="response",
+)
+def request_regional_forecast_limits_snapshot():
+    return trolie_request("/limits/regional/forecast-snapshot")
+
+
+@when(
+    "the client submits a Regional Forecast Limits Snapshot", target_fixture="response"
+)
+def submit_regional_forecast_limits_snapshot():
+    return trolie_request("/limits/regional/forecast-snapshot", method="POST")
+
+
+@when("the client submits a Forecast Proposal", target_fixture="response")
+def submit_regional_forecast_snapshot():
+    return trolie_request("/rating-proposals/forecast", method="PATCH")
 
 
 @then("the response is Unauthorized")
