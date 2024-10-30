@@ -3,5 +3,9 @@
     "test"
   ],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "cucumberautocomplete.steps": [
+    "test/step_defs/*.py"
+  ],
+  "cucumberautocomplete.strictGherkinCompletion": true
 }
