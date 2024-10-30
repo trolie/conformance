@@ -66,7 +66,16 @@ def test_forecast_proposal_authorization():
     pass
 
 
-@given("a TROLIE client that has not been authorized", target_fixture="auth_token")
+@pytest.mark.Forecasting
+@scenario(
+    "require_authorization.feature",
+    "Obtain Forecast Proposal Status requires authorization",
+)
+def test_forecast_proposal_status_authorization():
+    pass
+
+
+@given("a TROLIE client that has not been authenticated", target_fixture="auth_token")
 def client_not_authorized():
     return None
 
@@ -74,6 +83,11 @@ def client_not_authorized():
 @given("an empty body and no Content-Type specified")
 def empty_body():
     return None
+
+
+@given("a Forecast Proposal ID which may or may not exist")
+def forecast_proposal_id():
+    pass
 
 
 @when(
@@ -110,6 +124,13 @@ def submit_regional_forecast_limits_snapshot():
 @when("the client submits a Forecast Proposal", target_fixture="response")
 def submit_regional_forecast_snapshot():
     return trolie_request("/rating-proposals/forecast", method="PATCH")
+
+
+@when(
+    "the client requests the status of a Forecast Proposal", target_fixture="response"
+)
+def request_forecast_proposal_status():
+    return trolie_request("/rating-proposals/forecast")
 
 
 @then("the response is Unauthorized")
