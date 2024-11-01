@@ -1,29 +1,11 @@
-from datetime import datetime, timedelta
-import os
-import pytz
 from pytest_bdd import scenario, given, when, then
 import pytest
-import requests
-
-
-def trolie_request(relative_path, auth_token=None, method="GET"):
-    trolie_url = os.getenv("TROLIE_BASE_URL") + relative_path
-    return requests.request(method=method, url=trolie_url)
-
-
-def get_period(hours=0):
-    tz_name = os.getenv("TZ", "UTC")
-    timezone = pytz.timezone(tz_name)
-    return (
-        (datetime.now(timezone) + timedelta(hours=hours))
-        .replace(minute=0, second=0, microsecond=0)
-        .isoformat()
-    )
+from test.helpers import trolie_request, get_period
 
 
 @pytest.mark.Forecasting
 @scenario(
-    "require_authorization.feature",
+    "forecasting_requires_authentication.feature",
     "Get Forecast Limits Snapshot requires authorization",
 )
 def test_snapshot_authorization():
@@ -32,7 +14,7 @@ def test_snapshot_authorization():
 
 @pytest.mark.Forecasting
 @scenario(
-    "require_authorization.feature",
+    "forecasting_requires_authentication.feature",
     "Get Historical Forecast Limits Snapshot requires authorization",
 )
 def test_historical_snapshot_authorization():
@@ -41,7 +23,7 @@ def test_historical_snapshot_authorization():
 
 @pytest.mark.Forecasting
 @scenario(
-    "require_authorization.feature",
+    "forecasting_requires_authentication.feature",
     "Get Regional Forecast Limits Snapshot requires authorization",
 )
 def test_regional_snapshot_authorization():
@@ -50,7 +32,7 @@ def test_regional_snapshot_authorization():
 
 @pytest.mark.Forecasting
 @scenario(
-    "require_authorization.feature",
+    "forecasting_requires_authentication.feature",
     "Updating the Regional Forecast Limits Snapshot requires authorization",
 )
 def test_regional_forecast_proposal_authorization():
@@ -59,7 +41,7 @@ def test_regional_forecast_proposal_authorization():
 
 @pytest.mark.Forecasting
 @scenario(
-    "require_authorization.feature",
+    "forecasting_requires_authentication.feature",
     "Submitting a Forecast Proposal requires authorization",
 )
 def test_forecast_proposal_authorization():
@@ -68,7 +50,7 @@ def test_forecast_proposal_authorization():
 
 @pytest.mark.Forecasting
 @scenario(
-    "require_authorization.feature",
+    "forecasting_requires_authentication.feature",
     "Obtain Forecast Proposal Status requires authorization",
 )
 def test_forecast_proposal_status_authorization():
@@ -88,14 +70,6 @@ def empty_body():
 @given("a Forecast Proposal ID which may or may not exist")
 def forecast_proposal_id():
     pass
-
-
-@when(
-    "the client requests the current Forecast Limits Snapshot",
-    target_fixture="response",
-)
-def request_forecast_limits_snapshot():
-    return trolie_request("/limits/forecast-snapshot")
 
 
 @when(
