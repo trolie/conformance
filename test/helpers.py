@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from openapi_schema_validator import OAS30Validator
-from enum import StrEnum, auto
+from enum import Enum, StrEnum, auto
 from logging import warning
 import jsonschema
 import requests
 import os
 import pytz
 import yaml
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 class _CaseMatchingStrEnum(StrEnum):
@@ -79,7 +79,7 @@ class TrolieClient:
 
     def validate_response(self) -> bool:
         if content_type := self.get_response_header(Header.ContentType):
-            if _ := MediaType(content_type):
+            if _ := MediaTypes(MediaType.from_string(content_type)):
                 nfo = self.ResponseInfo(
                     verb=self.__response.request.method,
                     relative_path=self.__relative_path,
@@ -107,13 +107,55 @@ class TrolieClient:
         return os.getenv("TROLIE_BASE_URL") + relative_path
 
 
-class MediaType(StrEnum):
-    FORECAST_LIMITS_SNAPSHOT = "application/vnd.trolie.forecast-limits-snapshot.v1+json"
-    FORECAST_LIMITS_DETAILED_SNAPSHOT = (
+@dataclass
+class MediaType:
+    contentType: str
+    parameters: dict = field(default_factory=dict)
+
+    def __str__(self):
+        params = "; ".join(f"{k}={v}" for k, v in self.parameters.items())
+        return f"{self.contentType}; {params}"
+
+    def __eq__(self, other):
+        if not isinstance(other, MediaType):
+            return NotImplemented
+        return (
+            self.contentType == other.contentType
+            and self.parameters == other.parameters
+        )
+
+    @staticmethod
+    def from_string(media_type_str: str) -> "MediaType":
+        parts = media_type_str.split(";")
+        contentType = parts[0].strip()
+        parameters = {}
+        if len(parts) > 1:
+            param_str = parts[1].strip()
+            for param in param_str.split(","):
+                key, value = param.strip().split("=")
+                parameters[key] = value
+        return MediaType(contentType=contentType, parameters=parameters)
+
+
+class MediaTypes(Enum):
+    FORECAST_LIMITS_SNAPSHOT = MediaType.from_string(
+        "application/vnd.trolie.forecast-limits-snapshot.v1+json"
+    )
+    FORECAST_LIMITS_DETAILED_SNAPSHOT = MediaType.from_string(
         "application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json"
     )
-    FORECAST_LIMITS_SNAPSHOT_OMIT_PSR = "application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false"
-    FORECAST_LIMITS_DETAILED_SNAPSHOT_OMIT_PSR = "application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false"
+    FORECAST_LIMITS_SNAPSHOT_OMIT_PSR = MediaType.from_string(
+        "application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false"
+    )
+    FORECAST_LIMITS_DETAILED_SNAPSHOT_OMIT_PSR = MediaType.from_string(
+        "application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false"
+    )
+    FORECAST_LIMITS_SNAPSHOT_SLIM_APPARENT_POWER = MediaType.from_string(
+        "application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power"
+    )
+    FORECAST_LIMITS_SNAPSHOT_SLIM_APPARENT_POWER_INPUTS = MediaType.from_string(
+        "application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power, inputs-used=true"
+    )
 
 
 class TrolieMessage:

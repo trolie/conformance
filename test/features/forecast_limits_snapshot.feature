@@ -21,3 +21,14 @@ Feature: Provide forecast limits in appropriate formats
       | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json |
       | application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false |
       | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |
+
+  Scenario Outline: Obtaining the latest slim forecast snapshot
+    Given the Accept header is set to <content_type>
+    When the client requests the current Forecast Limits Snapshot
+    Then the response is 200 OK
+    And the Content-Type header in the response is <content_type>
+    And the response is schema-valid
+    Examples:
+      | content_type |
+      | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power |
+      # TODO | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power, inputs-used=true |

@@ -8,6 +8,13 @@ def test_latest_snapshot():
     pass
 
 
+@scenario(
+    "forecast_limits_snapshot.feature", "Obtaining the latest slim forecast snapshot"
+)
+def test_latest_slim_snapshot():
+    pass
+
+
 @given(
     "a TROLIE client that has been authenticated as a Ratings Provider",
     target_fixture="client",
