@@ -17,7 +17,7 @@ class _CaseMatchingStrEnum(StrEnum):
 
 class Role(_CaseMatchingStrEnum):
     RATINGS_PROVIDER = auto()
-    UNAUTHORIZED = auto()
+    UNAUTHENTICATED = auto()
 
 
 class Header(_CaseMatchingStrEnum):
@@ -31,6 +31,7 @@ class TrolieClient:
         self.auth_token = TrolieClient.__get_auth_token(role)
         self.__headers = {}
         self.__body = None
+        self.role = role
 
     def request(self, relative_path, method="GET") -> "TrolieClient":
         trolie_url = TrolieClient.__get_trolie_url(relative_path)
@@ -58,10 +59,11 @@ class TrolieClient:
             self.__body = None
         return self
 
-    def get_response_header(self, key: Header) -> str:
-        if response := self.__response:
+    def get_response_header(self, key: Header) -> int | str | None:
+        if self.__response and (response := self.__response):
             if key in response.headers:
-                return response.headers[key]
+                value = response.headers[key]
+                return int(value) if value.isdigit() else value
         return None
 
     def get_json(self):
@@ -97,7 +99,7 @@ class TrolieClient:
 
     @staticmethod
     def __get_auth_token(role: Role):
-        if role == Role.UNAUTHORIZED:
+        if role == Role.UNAUTHENTICATED:
             return None
         if token := os.getenv(f"{role}_TOKEN"):
             return token

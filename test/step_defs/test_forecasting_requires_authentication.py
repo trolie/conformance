@@ -60,7 +60,7 @@ def test_forecast_proposal_status_authorization():
 
 @given("a TROLIE client that has not been authenticated", target_fixture="client")
 def client_not_authorized():
-    return TrolieClient(role=Role.UNAUTHORIZED)
+    return TrolieClient(role=Role.UNAUTHENTICATED)
 
 
 @given("an empty body and no Content-Type specified")
