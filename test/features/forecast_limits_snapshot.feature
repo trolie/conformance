@@ -19,3 +19,5 @@ Feature: Provide forecast limits in appropriate formats
       | content_type |
       | application/vnd.trolie.forecast-limits-snapshot.v1+json |
       | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json |
+      | application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false |
+      | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |

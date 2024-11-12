@@ -97,6 +97,8 @@ class MediaType(StrEnum):
     FORECAST_LIMITS_DETAILED_SNAPSHOT = (
         "application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json"
     )
+    FORECAST_LIMITS_SNAPSHOT_OMIT_PSR = "application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false"
+    FORECAST_LIMITS_DETAILED_SNAPSHOT_OMIT_PSR = "application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false"
 
 
 class TrolieMessages:
@@ -107,6 +109,8 @@ class TrolieMessages:
         switch = {
             MediaType.FORECAST_LIMITS_SNAPSHOT: "forecast-limits-snapshot-elide-psr",
             MediaType.FORECAST_LIMITS_DETAILED_SNAPSHOT: "forecast-limits-detailed-snapshot",
+            MediaType.FORECAST_LIMITS_SNAPSHOT_OMIT_PSR: "forecast-limits-snapshot-elide-psr",
+            MediaType.FORECAST_LIMITS_DETAILED_SNAPSHOT_OMIT_PSR: "forecast-limits-detailed-snapshot-elide-psr",
         }
         schema = openapi_spec["components"]["schemas"][switch.get(media_type)]
         print(schema)
