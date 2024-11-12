@@ -31,4 +31,9 @@ Feature: Provide forecast limits in appropriate formats
     Examples:
       | content_type |
       | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power |
-      # TODO | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power, inputs-used=true |
+      # TODO: Prism's mock server returns the wrong media type
+      #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power, inputs-used=true |
+      # This literally crashes Prism's mock server
+      #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; inputs-used=true, limit-type=apparent-power  |
+      # Overall, we need to whitelist the media types supported
+      # using a test config and use the blacklist to assert 415 Unsupported Media Type
