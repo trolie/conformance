@@ -60,7 +60,8 @@ class TrolieClient:
 
     def get_response_header(self, key: Header) -> str:
         if response := self.__response:
-            return response.headers[key]
+            if key in response.headers:
+                return response.headers[key]
         return None
 
     def get_json(self):
