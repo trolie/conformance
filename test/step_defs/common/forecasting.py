@@ -1,10 +1,7 @@
 from pytest_bdd import when
-from test.helpers import trolie_request
+from test.helpers import TrolieClient
 
 
-@when(
-    "the client requests the current Forecast Limits Snapshot",
-    target_fixture="response",
-)
-def request_forecast_limits_snapshot():
-    return trolie_request("/limits/forecast-snapshot")
+@when("the client requests the current Forecast Limits Snapshot")
+def request_forecast_limits_snapshot(client: TrolieClient):
+    return client.request("/limits/forecast-snapshot")

@@ -12,7 +12,8 @@ Feature: Provide forecast limits in appropriate formats
   Scenario Outline: Obtaining the latest forecast snapshot
     Given the Accept header is set to <content_type>
     When the client requests the current Forecast Limits Snapshot
-    Then the Content-Type header in the response is <content_type>
+    Then the response is 200 OK
+    And the Content-Type header in the response is <content_type>
     And the response is a valid Forecast Limits Snapshot
     Examples:
       | content_type |

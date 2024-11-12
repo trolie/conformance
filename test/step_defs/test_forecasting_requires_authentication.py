@@ -1,6 +1,7 @@
+import uuid
 from pytest_bdd import scenario, given, when, then
 import pytest
-from test.helpers import trolie_request, get_period
+from test.helpers import Role, TrolieClient, get_period
 
 
 @pytest.mark.Forecasting
@@ -57,56 +58,48 @@ def test_forecast_proposal_status_authorization():
     pass
 
 
-@given("a TROLIE client that has not been authenticated", target_fixture="auth_token")
+@given("a TROLIE client that has not been authenticated", target_fixture="client")
 def client_not_authorized():
-    return None
+    return TrolieClient(role=Role.UNAUTHORIZED)
 
 
 @given("an empty body and no Content-Type specified")
-def empty_body():
-    return None
+def empty_body(client: TrolieClient):
+    return client.ensure_empty_request()
 
 
-@given("a Forecast Proposal ID which may or may not exist")
+@given(
+    "a Forecast Proposal ID which may or may not exist", target_fixture="proposal_id"
+)
 def forecast_proposal_id():
-    pass
+    return uuid.uuid4()
 
 
-@when(
-    "the client requests a Historical Forecast Limits Snapshot",
-    target_fixture="response",
-)
-def request_historical_forecast_limits_snapshot():
-    return trolie_request(f"/limits/forecast-snapshot/{get_period(-1)}")
+@when("the client requests a Historical Forecast Limits Snapshot")
+def request_historical_forecast_limits_snapshot(client: TrolieClient):
+    return client.request(f"/limits/forecast-snapshot/{get_period(-1)}")
 
 
-@when(
-    "the client requests a Regional Forecast Limits Snapshot",
-    target_fixture="response",
-)
-def request_regional_forecast_limits_snapshot():
-    return trolie_request("/limits/regional/forecast-snapshot")
+@when("the client requests a Regional Forecast Limits Snapshot")
+def request_regional_forecast_limits_snapshot(client: TrolieClient):
+    return client.request("/limits/regional/forecast-snapshot")
 
 
-@when(
-    "the client submits a Regional Forecast Limits Snapshot", target_fixture="response"
-)
-def submit_regional_forecast_limits_snapshot():
-    return trolie_request("/limits/regional/forecast-snapshot", method="POST")
+@when("the client submits a Regional Forecast Limits Snapshot")
+def submit_regional_forecast_limits_snapshot(client: TrolieClient):
+    return client.request("/limits/regional/forecast-snapshot", method="POST")
 
 
-@when("the client submits a Forecast Proposal", target_fixture="response")
-def submit_regional_forecast_snapshot():
-    return trolie_request("/rating-proposals/forecast", method="PATCH")
+@when("the client submits a Forecast Proposal")
+def submit_regional_forecast_snapshot(client: TrolieClient):
+    return client.request("/rating-proposals/forecast", method="PATCH")
 
 
-@when(
-    "the client requests the status of a Forecast Proposal", target_fixture="response"
-)
-def request_forecast_proposal_status():
-    return trolie_request("/rating-proposals/forecast")
+@when("the client requests the status of a Forecast Proposal")
+def request_forecast_proposal_status(client: TrolieClient):
+    return client.request("/rating-proposals/forecast")
 
 
 @then("the response is Unauthorized")
-def response_is_unauthorized(response):
-    assert response.status_code == 401
+def response_is_unauthorized(client: TrolieClient):
+    assert client.get_status_code() == 401

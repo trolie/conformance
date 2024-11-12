@@ -6,7 +6,7 @@ Feature: All Forecasting requests require authentication
   So that only authorized clients can access the system
   Without processing the request beyond the authentication step
   and without revealing any information about resources that may or may not exist
-  
+
   Background:
     Given a TROLIE client that has not been authenticated
 
