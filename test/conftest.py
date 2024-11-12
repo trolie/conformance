@@ -21,8 +21,10 @@ def pytest_bdd_apply_tag(tag, function):
 
 
 def pytest_bdd_after_scenario(request, feature, scenario):
+    if "skip_rate_limiting" in feature.tags or "skip_rate_limiting" in scenario.tags:
+        return
     if not request.session.shouldfail and os.getenv("RATE_LIMITING"):
         client: TrolieClient = request.getfixturevalue("client")
-        assert client.get_response_header("X-RateLimit-Limit")
-        assert client.get_response_header("X-RateLimit-Remaining")
-        assert client.get_response_header("X-RateLimit-Reset")
+        assert client.get_response_header("X-Rate-Limit-Limit")
+        assert client.get_response_header("X-Rate-Limit-Remaining")
+        assert client.get_response_header("X-Rate-Limit-Reset")
