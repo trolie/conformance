@@ -33,6 +33,7 @@ class TrolieClient:
         self.__body = None
         self.__method = None
         self.__trolie_url = None
+        self.__query_params = {}
         self.role = role
 
     def request(self, relative_path, method="GET") -> "TrolieClient":
@@ -45,7 +46,10 @@ class TrolieClient:
 
     def send(self) -> "TrolieClient":
         self.__response = requests.request(
-            method=self.__method, url=self.__trolie_url, headers=self.__headers
+            method=self.__method,
+            url=self.__trolie_url,
+            headers=self.__headers,
+            params=self.__query_params,
         )
         return self
 
@@ -55,6 +59,10 @@ class TrolieClient:
 
     def set_header(self, key: Header, value: str) -> "TrolieClient":
         self.__headers[key] = value
+        return self
+
+    def set_query_param(self, key: str, value: str | int) -> "TrolieClient":
+        self.__query_params[key] = value
         return self
 
     def ensure_empty_request(self) -> "TrolieClient":

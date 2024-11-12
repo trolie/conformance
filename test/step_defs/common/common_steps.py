@@ -1,5 +1,10 @@
-from pytest_bdd import then, when
+from pytest_bdd import given, then, when
 from test.helpers import TrolieClient
+
+
+@given("the client has bad query parameters")
+def bad_query_parameters(client: TrolieClient):
+    client.set_query_param("bad", "value")
 
 
 @then("the response is 200 OK")
@@ -10,6 +15,11 @@ def request_forecast_limits_snapshot(client: TrolieClient):
 @then("the response is 304 Not Modified")
 def request_forecast_limits_snapshot_304(client: TrolieClient):
     assert client.get_status_code() == 304
+
+
+@then("the response is 400 Bad Request")
+def request_forecast_limits_snapshot_400(client: TrolieClient):
+    assert client.get_status_code() == 400
 
 
 @then("the response is 415 Unsupported Media Type")

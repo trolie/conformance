@@ -30,6 +30,11 @@ def test_limit_forecasts_conditional_get():
     pass
 
 
+@scenario("forecast_limits_snapshot.feature", "Bad query params are malformed requests")
+def test_bad_query_parameters():
+    pass
+
+
 @given(
     "a TROLIE client that has been authenticated as a Ratings Provider",
     target_fixture="client",
