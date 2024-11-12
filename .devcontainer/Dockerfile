@@ -2,7 +2,8 @@ FROM mcr.microsoft.com/devcontainers/python:1-3-bookworm
 
 ENV PYTHONUNBUFFERED=1
 
-COPY --chown=vscode:vscode .devcontainer/*root.pem /usr/local/share/ca-certificates/MITM.crt
+COPY --chown=vscode:vscode .devcontainer/*root.pem /usr/local/share/ca-certificates/extra/MITM.crt
+COPY --chown=vscode:vscode .devcontainer/*pip.conf /etc/pip.conf
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y reinstall --no-install-recommends ca-certificates software-properties-common \
