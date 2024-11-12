@@ -7,6 +7,7 @@ import requests
 import os
 import pytz
 import yaml
+from dataclasses import dataclass
 
 
 class _CaseMatchingStrEnum(StrEnum):
@@ -33,6 +34,7 @@ class TrolieClient:
 
     def request(self, relative_path, method="GET") -> "TrolieClient":
         trolie_url = TrolieClient.__get_trolie_url(relative_path)
+        self.__relative_path = relative_path
         if self.auth_token:
             self.__headers["Authorization"] = f"Bearer {self.auth_token}"
         self.__response = requests.request(
@@ -67,12 +69,25 @@ class TrolieClient:
     def get_status_code(self) -> int:
         return self.__response.status_code
 
+    @dataclass
+    class ResponseInfo:
+        verb: str
+        relative_path: str
+        content_type: str
+        status_code: str
+        body: dict
+
     def validate_response(self) -> bool:
         if content_type := self.get_response_header(Header.ContentType):
-            if media_type := MediaType(content_type):
-                return TrolieMessages.is_valid(
-                    message=self.get_json(), media_type=media_type
+            if _ := MediaType(content_type):
+                nfo = self.ResponseInfo(
+                    verb=self.__response.request.method,
+                    relative_path=self.__relative_path,
+                    content_type=content_type,
+                    status_code=str(self.get_status_code()),
+                    body=self.get_json(),
                 )
+                return TrolieMessage.is_valid(nfo)
             else:
                 warning(f"Unknown media type: {content_type}")
         else:
@@ -101,31 +116,53 @@ class MediaType(StrEnum):
     FORECAST_LIMITS_DETAILED_SNAPSHOT_OMIT_PSR = "application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false"
 
 
-class TrolieMessages:
+class TrolieMessage:
     @staticmethod
-    def is_valid(message, media_type: MediaType):
+    def is_valid(response: TrolieClient.ResponseInfo) -> bool:
         with open("openapi.yaml") as f:
             openapi_spec = yaml.safe_load(f)
-        switch = {
-            MediaType.FORECAST_LIMITS_SNAPSHOT: "forecast-limits-snapshot-elide-psr",
-            MediaType.FORECAST_LIMITS_DETAILED_SNAPSHOT: "forecast-limits-detailed-snapshot",
-            MediaType.FORECAST_LIMITS_SNAPSHOT_OMIT_PSR: "forecast-limits-snapshot-elide-psr",
-            MediaType.FORECAST_LIMITS_DETAILED_SNAPSHOT_OMIT_PSR: "forecast-limits-detailed-snapshot-elide-psr",
-        }
-        schema = openapi_spec["components"]["schemas"][switch.get(media_type)]
-        print(schema)
+        schema = TrolieMessage.get_response_schema(response, openapi_spec)
         rooted_schemas = {
             "components": {"schemas": openapi_spec["components"]["schemas"]}
         }
-
         ref_resolver = jsonschema.RefResolver.from_schema(rooted_schemas)
         validator = OAS30Validator(schema, resolver=ref_resolver)
         try:
-            validator.validate(instance=message)
+            validator.validate(instance=response.body)
         except jsonschema.ValidationError as e:
             warning(f"Message failed validation: {e}")
             return False
         return True
+
+    @staticmethod
+    def _safe_get(d, keys):
+        _d = d.copy()
+        for key in keys:
+            try:
+                _d = _d[key]
+            except (KeyError, TypeError):
+                raise ValueError(f"Key not found: {key} in child {_d} of {d}")
+        return _d
+
+    @staticmethod
+    def get_response_schema(
+        response: TrolieClient.ResponseInfo, openapi_spec: dict
+    ) -> dict:
+        content_info_path = [
+            "paths",
+            response.relative_path,
+            response.verb.lower(),
+            "responses",
+            response.status_code,
+            "content",
+            response.content_type,
+        ]
+        content_info = TrolieMessage._safe_get(openapi_spec, content_info_path)
+        if "$ref" in content_info["schema"]:
+            schema_ref = content_info["schema"]["$ref"]
+            schema_name = schema_ref.split("/")[-1]
+            return openapi_spec["components"]["schemas"][schema_name]
+        return content_info["schema"]
 
 
 def get_period(hours=0):
