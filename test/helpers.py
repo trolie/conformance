@@ -31,15 +31,21 @@ class TrolieClient:
         self.auth_token = TrolieClient.__get_auth_token(role)
         self.__headers = {}
         self.__body = None
+        self.__method = None
+        self.__trolie_url = None
         self.role = role
 
     def request(self, relative_path, method="GET") -> "TrolieClient":
-        trolie_url = TrolieClient.__get_trolie_url(relative_path)
+        self.__trolie_url = TrolieClient.__get_trolie_url(relative_path)
+        self.__method = method
         self.__relative_path = relative_path
         if self.auth_token:
             self.__headers["Authorization"] = f"Bearer {self.auth_token}"
+        return self.send()
+
+    def send(self) -> "TrolieClient":
         self.__response = requests.request(
-            method=method, url=trolie_url, headers=self.__headers
+            method=self.__method, url=self.__trolie_url, headers=self.__headers
         )
         return self
 

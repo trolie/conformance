@@ -23,6 +23,13 @@ def test_latest_slim_snapshot_requires_limit_type():
     pass
 
 
+@scenario(
+    "forecast_limits_snapshot.feature", "Limit forecasts should support conditional GET"
+)
+def test_limit_forecasts_conditional_get():
+    pass
+
+
 @given(
     "a TROLIE client that has been authenticated as a Ratings Provider",
     target_fixture="client",

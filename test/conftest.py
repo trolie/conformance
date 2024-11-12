@@ -6,7 +6,7 @@ from test.helpers import Role, TrolieClient
 
 pytest_plugins = [
     "test.step_defs.common.forecasting",
-    "test.step_defs.common.common_assertions",
+    "test.step_defs.common.common_steps",
 ]
 
 
@@ -24,6 +24,8 @@ def pytest_bdd_after_scenario(request, feature, scenario):
     if "skip_rate_limiting" in feature.tags or "skip_rate_limiting" in scenario.tags:
         return
     client: TrolieClient = request.getfixturevalue("client")
+    if not getattr(client, "response", None):
+        return
     if not request.session.shouldfail:
         if os.getenv("RATE_LIMITING"):
             if client.role == Role.UNAUTHENTICATED:
