@@ -15,6 +15,14 @@ def test_latest_slim_snapshot():
     pass
 
 
+@scenario(
+    "forecast_limits_snapshot.feature",
+    "Requesting the slim forecast snapshot requires a limit type",
+)
+def test_latest_slim_snapshot_requires_limit_type():
+    pass
+
+
 @given(
     "a TROLIE client that has been authenticated as a Ratings Provider",
     target_fixture="client",
