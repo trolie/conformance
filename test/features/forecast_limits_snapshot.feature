@@ -14,7 +14,8 @@ Feature: Provide forecast limits in appropriate formats
     When the client requests the current Forecast Limits Snapshot
     Then the response is 200 OK
     And the Content-Type header in the response is <content_type>
-    And the response is a valid Forecast Limits Snapshot
+    And the response is schema-valid
     Examples:
       | content_type |
       | application/vnd.trolie.forecast-limits-snapshot.v1+json |
+      | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json |

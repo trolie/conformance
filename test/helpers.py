@@ -67,6 +67,18 @@ class TrolieClient:
     def get_status_code(self) -> int:
         return self.__response.status_code
 
+    def validate_response(self) -> bool:
+        if content_type := self.get_response_header(Header.ContentType):
+            if media_type := MediaType(content_type):
+                return TrolieMessages.is_valid(
+                    message=self.get_json(), media_type=media_type
+                )
+            else:
+                warning(f"Unknown media type: {content_type}")
+        else:
+            warning("Missing Content-Type header")
+        return False
+
     @staticmethod
     def __get_auth_token(role: Role):
         if role == Role.UNAUTHORIZED:
@@ -82,6 +94,9 @@ class TrolieClient:
 
 class MediaType(StrEnum):
     FORECAST_LIMITS_SNAPSHOT = "application/vnd.trolie.forecast-limits-snapshot.v1+json"
+    FORECAST_LIMITS_DETAILED_SNAPSHOT = (
+        "application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json"
+    )
 
 
 class TrolieMessages:
@@ -91,6 +106,7 @@ class TrolieMessages:
             openapi_spec = yaml.safe_load(f)
         switch = {
             MediaType.FORECAST_LIMITS_SNAPSHOT: "forecast-limits-snapshot-elide-psr",
+            MediaType.FORECAST_LIMITS_DETAILED_SNAPSHOT: "forecast-limits-detailed-snapshot",
         }
         schema = openapi_spec["components"]["schemas"][switch.get(media_type)]
         print(schema)
