@@ -6,8 +6,8 @@ from test.helpers import Role, TrolieClient
 
 pytest_plugins = [
     "test.common.common_steps",
-    "test.forecasting.step_defs.forecasting_requires_authentication",
-    "test.forecasting.step_defs.forecast_limits_snapshot",
+    "test.forecasting.step_defs.require_authentication",
+    "test.forecasting.step_defs.limits_snapshot",
 ]
 
 
