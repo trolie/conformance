@@ -1,61 +1,6 @@
 import uuid
-from pytest_bdd import scenario, given, when, then
-import pytest
+from pytest_bdd import given, when, then
 from test.helpers import Role, TrolieClient, get_period
-
-
-@pytest.mark.Forecasting
-@scenario(
-    "forecasting_requires_authentication.feature",
-    "Get Forecast Limits Snapshot requires authorization",
-)
-def test_snapshot_authorization():
-    pass
-
-
-@pytest.mark.Forecasting
-@scenario(
-    "forecasting_requires_authentication.feature",
-    "Get Historical Forecast Limits Snapshot requires authorization",
-)
-def test_historical_snapshot_authorization():
-    pass
-
-
-@pytest.mark.Forecasting
-@scenario(
-    "forecasting_requires_authentication.feature",
-    "Get Regional Forecast Limits Snapshot requires authorization",
-)
-def test_regional_snapshot_authorization():
-    pass
-
-
-@pytest.mark.Forecasting
-@scenario(
-    "forecasting_requires_authentication.feature",
-    "Updating the Regional Forecast Limits Snapshot requires authorization",
-)
-def test_regional_forecast_proposal_authorization():
-    pass
-
-
-@pytest.mark.Forecasting
-@scenario(
-    "forecasting_requires_authentication.feature",
-    "Submitting a Forecast Proposal requires authorization",
-)
-def test_forecast_proposal_authorization():
-    pass
-
-
-@pytest.mark.Forecasting
-@scenario(
-    "forecasting_requires_authentication.feature",
-    "Obtain Forecast Proposal Status requires authorization",
-)
-def test_forecast_proposal_status_authorization():
-    pass
 
 
 @given("a TROLIE client that has not been authenticated", target_fixture="client")

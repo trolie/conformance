@@ -8,6 +8,12 @@ from test.helpers import Header, TrolieClient
     )
 )
 def accept_header(content_type, client):
+    header = f"{content_type}, application/problem+json"
+    client.set_header(Header.Accept, header)
+
+
+@given(parsers.parse("the Accept header is set to `{content_type}`"))
+def bad_accept_header(content_type, client):
     client.set_header(Header.Accept, content_type)
 
 
@@ -40,6 +46,11 @@ def request_forecast_limits_snapshot_400(client: TrolieClient):
 @then("the response is 415 Unsupported Media Type")
 def request_forecast_limits_snapshot_415(client: TrolieClient):
     assert client.get_status_code() == 415
+
+
+@then("the response is 406 Not Acceptable")
+def request_forecast_limits_snapshot_406(client: TrolieClient):
+    assert client.get_status_code() == 406
 
 
 @then("the response is schema-valid")

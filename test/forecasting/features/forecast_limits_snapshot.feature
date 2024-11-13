@@ -98,3 +98,18 @@ Feature: Provide forecast limits in appropriate formats
       | application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false |
       | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |
       | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power |
+
+  Scenario Outline: Media types are required
+    Given the Accept header is set to `<content_type>`
+    When the client requests the current Forecast Limits Snapshot
+    Then the response is 406 Not Acceptable
+    And the Content-Type header in the response is `application/problem+json`
+    And the response is schema-valid
+    Examples:
+      | content_type |
+      | application/json |
+      | application/vnd.trolie.realtime-limits-snapshot.v1+json |
+      # Prism returns 200, incorrectly, for the following @prism_fail
+      #| */* |
+      #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json, limit-type=apparent-power |
+      #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; inputs-used=true; limit-type=apparent-power  |
