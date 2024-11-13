@@ -88,6 +88,9 @@ class TrolieClient:
     def get_status_code(self) -> int:
         return self.__response.status_code
 
+    def response_is_empty(self) -> bool:
+        return len(self.__response.content) == 0
+
     @dataclass
     class ResponseInfo:
         verb: str

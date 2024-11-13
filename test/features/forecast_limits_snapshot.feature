@@ -54,6 +54,7 @@ Feature: Provide forecast limits in appropriate formats
     When the client issues a conditional GET for the same resource
     Then the response is 304 Not Modified
     And the the response is empty
+    And there is no Content-Type header in the response
     Examples:
       | content_type |
       | application/vnd.trolie.forecast-limits-snapshot.v1+json |
@@ -64,6 +65,7 @@ Feature: Provide forecast limits in appropriate formats
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power, inputs-used=true |
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; inputs-used=true, limit-type=apparent-power  |
 
+  # Prism ignores bad query params and sends a 200 OK
   @prism_fail
   Scenario Outline: Bad query params are malformed requests
     Given the Accept header is set to `<content_type>, application/problem+json`
