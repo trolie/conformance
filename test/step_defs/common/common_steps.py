@@ -1,10 +1,25 @@
-from pytest_bdd import given, then, when
-from test.helpers import TrolieClient
+from pytest_bdd import given, then, when, parsers
+from test.helpers import Header, TrolieClient
+
+
+@given(
+    parsers.parse(
+        "the Accept header is set to `{content_type}, application/problem+json`"
+    )
+)
+def accept_header(content_type, client):
+    client.set_header(Header.Accept, content_type)
 
 
 @given("the client has bad query parameters")
 def bad_query_parameters(client: TrolieClient):
     client.set_query_param("bad", "value")
+
+
+@given("the client has a non-empty body")
+def non_empty_body(client: TrolieClient):
+    client.set_body({"key": "value"})
+    client.set_header("Content-Type", "application/json")
 
 
 @then("the response is 200 OK")
@@ -42,3 +57,8 @@ def conditional_get(client: TrolieClient):
 def empty_response(client: TrolieClient):
     assert not client.get_json()
     assert not client.get_response_header("Content-Type")
+
+
+@then(parsers.parse("the Content-Type header in the response is `{content_type}`"))
+def content_type_header(content_type, client):
+    assert content_type == client.get_response_header(Header.ContentType)

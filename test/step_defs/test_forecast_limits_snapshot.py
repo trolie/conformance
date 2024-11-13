@@ -1,6 +1,6 @@
-from pytest_bdd import scenario, given, then, parsers
+from pytest_bdd import scenario, given
 
-from test.helpers import Header, Role, TrolieClient
+from test.helpers import Role, TrolieClient
 
 
 @scenario("forecast_limits_snapshot.feature", "Obtaining the latest forecast snapshot")
@@ -35,19 +35,17 @@ def test_bad_query_parameters():
     pass
 
 
+@scenario(
+    "forecast_limits_snapshot.feature",
+    "Sending a body with a GET request is a bad request",
+)
+def test_non_empty_body_in_get():
+    pass
+
+
 @given(
     "a TROLIE client that has been authenticated as a Ratings Provider",
     target_fixture="client",
 )
 def client_authenticated_as_ratings_provider():
     return TrolieClient(role=Role.RATINGS_PROVIDER)
-
-
-@given(parsers.parse("the Accept header is set to {content_type}"))
-def accept_header(content_type, client):
-    client.set_header(Header.Accept, content_type)
-
-
-@then(parsers.parse("the Content-Type header in the response is {content_type}"))
-def content_type_header(content_type, client):
-    assert content_type == client.get_response_header(Header.ContentType)

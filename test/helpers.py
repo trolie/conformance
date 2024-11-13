@@ -35,6 +35,7 @@ class TrolieClient:
         self.__trolie_url = None
         self.__query_params = {}
         self.role = role
+        self.__response = None
 
     def request(self, relative_path, method="GET") -> "TrolieClient":
         self.__trolie_url = TrolieClient.__get_trolie_url(relative_path)
@@ -50,6 +51,7 @@ class TrolieClient:
             url=self.__trolie_url,
             headers=self.__headers,
             params=self.__query_params,
+            json=self.__body,
         )
         return self
 
@@ -74,9 +76,9 @@ class TrolieClient:
         return self
 
     def get_response_header(self, key: Header) -> int | str | None:
-        if self.__response and (response := self.__response):
-            if key in response.headers:
-                value = response.headers[key]
+        if self.__response is not None:
+            if key in self.__response.headers:
+                value = self.__response.headers[key]
                 return int(value) if value.isdigit() else value
         return None
 
@@ -155,6 +157,7 @@ class MediaType:
 
 
 class MediaTypes(Enum):
+    PROBLEM = MediaType.from_string("application/problem+json")
     FORECAST_LIMITS_SNAPSHOT = MediaType.from_string(
         "application/vnd.trolie.forecast-limits-snapshot.v1+json"
     )
@@ -198,6 +201,10 @@ class TrolieMessage:
         _d = d.copy()
         for key in keys:
             try:
+                if "$ref" in _d:
+                    ref = _d["$ref"]
+                    ref_parts = ref.removeprefix("#/").split("/")
+                    _d = d[ref_parts[0]][ref_parts[1]][ref_parts[2]]
                 _d = _d[key]
             except (KeyError, TypeError):
                 raise ValueError(f"Key not found: {key} in child {_d} of {d}")
