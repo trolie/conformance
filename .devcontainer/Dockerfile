@@ -2,8 +2,11 @@ FROM mcr.microsoft.com/devcontainers/python:1-3-bookworm
 
 ENV PYTHONUNBUFFERED=1
 
-COPY --chown=vscode:vscode .devcontainer/*root.pem /usr/local/share/ca-certificates/extra/MITM.crt
-COPY --chown=vscode:vscode .devcontainer/*pip.conf /etc/pip.conf
+RUN --mount=type=bind,target=/mnt \
+  find /mnt/.devcontainer -maxdepth 1 -type f -name '*.pem' -exec install -D -t /usr/local/share/ca-certificates/extra {} \;
+
+RUN --mount=type=bind,target=/mnt \
+  find /mnt/.devcontainer -maxdepth 1 -type f -name 'pip.conf' -exec install -D {} /etc \;
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y reinstall --no-install-recommends ca-certificates software-properties-common \

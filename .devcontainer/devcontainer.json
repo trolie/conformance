@@ -20,9 +20,5 @@
 		}
 	},
 	"onCreateCommand": "curl -o /workspace/openapi.yaml https://trolie.energy/openapi.yaml",
-	"postCreateCommand": "pip install -r /workspace/requirements.txt && git config --global --add safe.directory /workspace",
-	"containerEnv": {
-		"NODE_EXTRA_CA_CERTS": "/workspace/.devcontainer/root.pem",
-		"GIT_SSL_CAINFO": "/workspace/.devcontainer/root.pem"
-	}
+	"postCreateCommand": "pip install -r /workspace/requirements.txt && git config --global --add safe.directory /workspace"
 }
