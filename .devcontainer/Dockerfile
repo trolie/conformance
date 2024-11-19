@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/devcontainers/python:1-3-bookworm
 ENV PYTHONUNBUFFERED=1
 
 RUN --mount=type=bind,target=/mnt \
-  find /mnt/.devcontainer -maxdepth 1 -type f -name '*.pem' -exec install -D -t /usr/local/share/ca-certificates/extra {} \;
+  find /mnt/.devcontainer -maxdepth 1 -type f -name '*.crt' -exec install -D -t /usr/local/share/ca-certificates/extra {} \;
 
 RUN --mount=type=bind,target=/mnt \
   find /mnt/.devcontainer -maxdepth 1 -type f -name 'pip.conf' -exec install -D {} /etc \;

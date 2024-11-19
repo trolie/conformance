@@ -2,9 +2,9 @@
 openapi.yaml
 
 # this is the self-signed certificate for folks behind a corporate proxy
-.devcontainer/root.pem
+.devcontainer/*.crt
 
-# local pip.conf ignored to support corproate proxy
+# local pip.conf ignored to support corporate proxy
 pip.conf
 
 # Byte-compiled / optimized / DLL files
