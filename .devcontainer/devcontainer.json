@@ -19,6 +19,6 @@
 			]
 		}
 	},
-	"onCreateCommand": "curl -o /workspace/openapi.yaml https://trolie.energy/openapi.yaml",
+	"onCreateCommand": "curl -o /workspace/openapi.yaml https://trolie.energy/openapi-1.0.yaml",
 	"postCreateCommand": "pip install -r /workspace/requirements.txt && git config --global --add safe.directory /workspace"
 }
