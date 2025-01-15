@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from openapi_schema_validator import OAS30Validator
 from enum import Enum, StrEnum, auto
 from logging import warning
+from typing import Optional, Protocol, runtime_checkable
 import jsonschema
 import requests
 import os
@@ -26,9 +27,19 @@ class Header(_CaseMatchingStrEnum):
     ContentType = "Content-Type"
 
 
+@runtime_checkable
+class AuthTokenProvider(Protocol):
+    def get_auth_token(self, role: Role) -> Optional[str]: ...
+
+
 class TrolieClient:
     def __init__(self, role: Role):
-        self.auth_token = TrolieClient.__get_auth_token(role)
+        auth_token = TrolieClient.__get_auth_token(role)
+        if auth_token is None and role != Role.UNAUTHENTICATED:
+            raise ValueError(
+                f"Failed to obtain Authentication token required for role {role}"
+            )
+        self.auth_token = auth_token
         self.__headers = {}
         self.__body = None
         self.__method = None
@@ -117,12 +128,34 @@ class TrolieClient:
         return False
 
     @staticmethod
-    def __get_auth_token(role: Role):
+    def __get_auth_token(role: Role) -> Optional[str]:
         if role == Role.UNAUTHENTICATED:
             return None
+
+        if auth_token_provider := TrolieClient.__load_auth_token_provider():
+            return auth_token_provider.get_auth_token(role)
+
         if token := os.getenv(f"{role}_TOKEN"):
             return token
+
         raise ValueError(f"Missing {role}_TOKEN environment variable")
+
+    @staticmethod
+    def __load_auth_token_provider() -> Optional[AuthTokenProvider]:
+        try:
+            import auth_token_provider
+        except ImportError:
+            return None
+
+        for attr_name in dir(auth_token_provider):
+            if attr_name == "AuthTokenProvider":
+                # avoid instantiating the protocol if it's imported for some reason
+                continue
+            attr = getattr(auth_token_provider, attr_name)
+            if isinstance(attr, type) and issubclass(attr, AuthTokenProvider):
+                return attr()
+
+        return None
 
     @staticmethod
     def __get_trolie_url(relative_path):

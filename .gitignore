@@ -7,6 +7,9 @@ openapi.yaml
 # local pip.conf ignored to support corporate proxy
 pip.conf
 
+# ensure the local authorization provider is never checked in
+test/auth_token_provider.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
