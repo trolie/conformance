@@ -1,5 +1,13 @@
 from pytest_bdd import given, then, when, parsers
-from test.helpers import Header, TrolieClient
+from test.helpers import Header, TrolieClient, Role
+
+
+@given(
+    "a TROLIE client that has been authenticated as a Ratings Provider",
+    target_fixture="client",
+)
+def client_authenticated_as_ratings_provider():
+    return TrolieClient(role=Role.RATINGS_PROVIDER)
 
 
 @given(

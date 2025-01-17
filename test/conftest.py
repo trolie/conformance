@@ -8,6 +8,7 @@ pytest_plugins = [
     "test.common.common_steps",
     "test.forecasting.step_defs.require_authentication",
     "test.forecasting.step_defs.limits_snapshot",
+    "test.seasonal.step_defs.rating_snapshot",
 ]
 
 

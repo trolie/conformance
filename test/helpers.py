@@ -212,6 +212,9 @@ class MediaTypes(Enum):
     FORECAST_LIMITS_SNAPSHOT_SLIM_APPARENT_POWER_INPUTS = MediaType.from_string(
         "application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power, inputs-used=true"
     )
+    SEASONAL_RATINGS_SNAPSHOT = MediaType.from_string(
+        "application/vnd.trolie.seasonal-rating-snapshot.v1+json"
+    )
 
 
 class TrolieMessage:
