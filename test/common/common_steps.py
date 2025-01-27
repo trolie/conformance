@@ -10,16 +10,6 @@ def client_authenticated_as_ratings_provider():
     return TrolieClient(role=Role.RATINGS_PROVIDER)
 
 
-@given(
-    parsers.parse(
-        "the Accept header is set to `{content_type}, application/problem+json`"
-    )
-)
-def accept_header(content_type, client):
-    header = f"{content_type}, application/problem+json"
-    client.set_header(Header.Accept, header)
-
-
 @given(parsers.parse("the Accept header is set to `{content_type}`"))
 def bad_accept_header(content_type, client):
     client.set_header(Header.Accept, content_type)

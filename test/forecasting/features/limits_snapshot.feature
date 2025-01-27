@@ -10,7 +10,7 @@ Feature: Provide forecast limits in appropriate formats
     Given a TROLIE client that has been authenticated as a Ratings Provider
 
   Scenario Outline: Obtaining the latest forecast snapshot
-    Given the Accept header is set to `<content_type>, application/problem+json`
+    Given the Accept header is set to `<content_type>`
     When the client requests the current Forecast Limits Snapshot
     Then the response is 200 OK
     And the Content-Type header in the response is `<content_type>`
@@ -23,7 +23,7 @@ Feature: Provide forecast limits in appropriate formats
       | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |
 
   Scenario Outline: Obtaining the latest slim forecast snapshot
-    Given the Accept header is set to `<content_type>, application/problem+json`
+    Given the Accept header is set to `<content_type>`
     When the client requests the current Forecast Limits Snapshot
     Then the response is 200 OK
     And the Content-Type header in the response is `<content_type>`
@@ -38,9 +38,35 @@ Feature: Provide forecast limits in appropriate formats
       # Overall, we need to whitelist the media types supported
       # using a test config and use the blacklist to assert 415 Unsupported Media Type
 
+  Scenario Outline: Client should be permitted to request `application/problem+json` explicitly
+    Given the Accept header is set to `<content_type>, application/problem+json`
+    When the client requests the current Forecast Limits Snapshot
+    Then the response is 200 OK
+    And the Content-Type header in the response is `<content_type>`
+    And the response is schema-valid
+    Examples:
+      | content_type |
+      | application/vnd.trolie.forecast-limits-snapshot.v1+json |
+      | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json |
+      | application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false |
+      | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |
+
+  Scenario Outline: Client should be permitted to accept `*/*` explicitly
+    Given the Accept header is set to `<content_type>, */*`
+    When the client requests the current Forecast Limits Snapshot
+    Then the response is 200 OK
+    And the Content-Type header in the response is `<content_type>`
+    And the response is schema-valid
+    Examples:
+      | content_type |
+      | application/vnd.trolie.forecast-limits-snapshot.v1+json |
+      | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json |
+      | application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false |
+      | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |
+
   @prism_fail
   Scenario: Requesting the slim forecast snapshot requires a limit type
-    Given the Accept header is set to `application/vnd.trolie.forecast-limits-snapshot-slim.v1+json, application/problem+json`
+    Given the Accept header is set to `application/vnd.trolie.forecast-limits-snapshot-slim.v1+json`
     When the client requests the current Forecast Limits Snapshot
     Then the response is 415 Unsupported Media Type
     And the Content-Type header in the response is `application/problem+json`
@@ -49,7 +75,7 @@ Feature: Provide forecast limits in appropriate formats
 
   @prism_fail
   Scenario Outline: Limit forecasts should support conditional GET
-    Given the Accept header is set to `<content_type>, application/problem+json`
+    Given the Accept header is set to `<content_type>`
     And the client requests the current Forecast Limits Snapshot
     When the client issues a conditional GET for the same resource
     Then the response is 304 Not Modified
@@ -68,7 +94,7 @@ Feature: Provide forecast limits in appropriate formats
   # Prism ignores bad query params and sends a 200 OK
   @prism_fail
   Scenario Outline: Bad query params are malformed requests
-    Given the Accept header is set to `<content_type>, application/problem+json`
+    Given the Accept header is set to `<content_type>`
     And the client has bad query parameters
     When the client requests the current Forecast Limits Snapshot
     Then the response is 400 Bad Request
@@ -85,7 +111,7 @@ Feature: Provide forecast limits in appropriate formats
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; inputs-used=true, limit-type=apparent-power  |
 
   Scenario Outline: Sending a body with a GET request is a bad request 
-    Given the Accept header is set to `<content_type>, application/problem+json`
+    Given the Accept header is set to `<content_type>`
     And the client has a non-empty body
     When the client requests the current Forecast Limits Snapshot
     Then the response is 400 Bad Request
