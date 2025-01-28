@@ -192,35 +192,28 @@ class MediaType:
         return MediaType(contentType=contentType, parameters=parameters)
 
 
-class MediaTypes(Enum):
-    PROBLEM = MediaType.from_string("application/problem+json")
-    FORECAST_LIMITS_SNAPSHOT = MediaType.from_string(
-        "application/vnd.trolie.forecast-limits-snapshot.v1+json"
-    )
-    FORECAST_LIMITS_DETAILED_SNAPSHOT = MediaType.from_string(
-        "application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json"
-    )
-    FORECAST_LIMITS_SNAPSHOT_OMIT_PSR = MediaType.from_string(
-        "application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false"
-    )
-    FORECAST_LIMITS_DETAILED_SNAPSHOT_OMIT_PSR = MediaType.from_string(
-        "application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false"
-    )
-    FORECAST_LIMITS_SNAPSHOT_SLIM_APPARENT_POWER = MediaType.from_string(
-        "application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power"
-    )
-    FORECAST_LIMITS_SNAPSHOT_SLIM_APPARENT_POWER_INPUTS = MediaType.from_string(
-        "application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power, inputs-used=true"
-    )
-    SEASONAL_RATINGS_SNAPSHOT = MediaType.from_string(
-        "application/vnd.trolie.seasonal-rating-snapshot.v1+json"
-    )
-    SEASONAL_RATINGS_DETAILED_SNAPSHOT = MediaType.from_string(
-        "application/vnd.trolie.seasonal-rating-snapshot-detailed.v1+json"
-    )
-    SEASONAL_RATINGS_DETAILED_SNAPSHOT_ELIDE_PSR_HEADER = MediaType.from_string(
-        "application/vnd.trolie.seasonal-rating-snapshot-detailed.v1+json; include-psr-header=false"
-    )
+# Function to load media types from openapi.yaml
+def load_media_types_from_yaml(file_path: str) -> dict:
+    with open(file_path, "r") as file:
+        openapi_spec = yaml.safe_load(file)
+
+    media_types = {}
+    for _, path_item in openapi_spec.get("paths", {}).items():
+        for operation in path_item.values():
+            if "requestBody" in operation:
+                content = operation["requestBody"].get("content", {})
+                for media_type in content.keys():
+                    media_types[media_type] = MediaType.from_string(media_type)
+            for response in operation.get("responses", {}).values():
+                content = response.get("content", {})
+                for media_type in content.keys():
+                    media_types[media_type] = MediaType.from_string(media_type)
+    return media_types
+
+
+media_types = load_media_types_from_yaml("/workspace/openapi.yaml")
+
+MediaTypes = Enum("MediaTypes", media_types)
 
 
 class TrolieMessage:
