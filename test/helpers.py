@@ -215,6 +215,12 @@ class MediaTypes(Enum):
     SEASONAL_RATINGS_SNAPSHOT = MediaType.from_string(
         "application/vnd.trolie.seasonal-rating-snapshot.v1+json"
     )
+    SEASONAL_RATINGS_DETAILED_SNAPSHOT = MediaType.from_string(
+        "application/vnd.trolie.seasonal-rating-snapshot-detailed.v1+json"
+    )
+    SEASONAL_RATINGS_DETAILED_SNAPSHOT_ELIDE_PSR_HEADER = MediaType.from_string(
+        "application/vnd.trolie.seasonal-rating-snapshot-detailed.v1+json; include-psr-header=false"
+    )
 
 
 class TrolieMessage:
