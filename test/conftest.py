@@ -3,13 +3,13 @@ import pytest
 
 from test.helpers import Role, TrolieClient
 
+from glob import glob
 
 pytest_plugins = [
-    "test.common.common_steps",
-    "test.forecasting.step_defs.require_authentication",
-    "test.forecasting.step_defs.limits_snapshot",
-    "test.seasonal.step_defs.rating_snapshot",
-]
+    fixture.replace("/", ".").replace(".py", "")
+    for fixture in glob("test/**/step_defs/*.py")
+    if "__" not in fixture
+] + ["test.common.common_steps"]
 
 
 def pytest_bdd_apply_tag(tag, function):
