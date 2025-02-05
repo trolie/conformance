@@ -9,9 +9,10 @@ ARG cert_path=/usr/local/share/ca-certificates/extra
 RUN --mount=type=bind,target=/mnt \
   mkdir -p $cert_path && \
   find /mnt/.devcontainer -maxdepth 1 -type f -name '*.crt' -exec install -D -t $cert_path {} \;
-# ensure vscode can use the user provided certificates
-RUN shopt -s nullglob; cat $cert_path/*.crt > $cert_path/node_extra_ca_certs
-ENV NODE_EXTRA_CA_CERTS=$cert_path/node_extra_ca_certs
+# ensure vscode server and python can use the user provided certificates
+RUN shopt -s nullglob; cat $cert_path/*.crt > $cert_path/extra_ca_certs
+ENV NODE_EXTRA_CA_CERTS=$cert_path/extra_ca_certs
+ENV REQUESTS_CA_BUNDLE=$cert_path/extra_ca_certs
 
 # ensure that the user can use a local python package repo
 RUN --mount=type=bind,target=/mnt \
