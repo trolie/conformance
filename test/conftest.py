@@ -5,7 +5,7 @@ from test.helpers import Role, TrolieClient
 
 from glob import glob
 
-# in order to organize the conformance tests into different "profiles", i.e., forecasting, reatlime, seasonal, and peering,
+# In order to organize the conformance tests into different "profiles", i.e., forecasting, realtime, seasonal, and peering,
 # we need to help pytest-bdd find the step definitions. The simplest way to do this is
 # get them loaded via the pytest_plugins.
 # https://gist.github.com/peterhurford/09f7dcda0ab04b95c026c60fa49c2a68?permalink_comment_id=3453153#gistcomment-3453153
