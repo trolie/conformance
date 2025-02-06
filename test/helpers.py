@@ -42,6 +42,10 @@ class TrolieClient:
             )
         self.auth_token = auth_token
         self.__headers = {}
+        if role != Role.UNAUTHENTICATED:
+            self.__headers["X-TROLIE-Testing-Identity"] = (
+                TrolieClient.__get_testing_identity(role)
+            )
         self.__body = None
         self.__method = None
         self.__trolie_url = None
@@ -129,6 +133,12 @@ class TrolieClient:
         return False
 
     @staticmethod
+    def __get_testing_identity(role: Role) -> Optional[str]:
+        if role == Role.UNAUTHENTICATED:
+            return None
+        if role == Role.RATINGS_PROVIDER:
+            return "TO1"
+
     def __get_auth_token(role: Role) -> Optional[str]:
         if role == Role.UNAUTHENTICATED:
             return None
