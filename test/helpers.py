@@ -1,7 +1,8 @@
+from __future__ import annotations
 from datetime import datetime, timedelta
 from openapi_schema_validator import OAS30Validator
 from enum import Enum, StrEnum, auto
-from logging import warning
+from logging import info, warning
 from typing import Optional, Protocol, runtime_checkable
 import jsonschema
 import requests
@@ -133,7 +134,12 @@ class TrolieClient:
             return None
 
         if auth_token_provider := TrolieClient.__load_auth_token_provider():
-            return auth_token_provider.get_auth_token(role)
+            if token := auth_token_provider.get_auth_token(role):
+                return token
+            else:
+                warning(f"Token Provider Failed to obtain token for role {role}")
+        else:
+            info("No AuthTokenProvider found")
 
         if token := os.getenv(f"{role}_TOKEN"):
             return token
@@ -142,6 +148,9 @@ class TrolieClient:
 
     @staticmethod
     def __load_auth_token_provider() -> Optional[AuthTokenProvider]:
+        if hasattr(TrolieClient, "_auth_token_provider"):
+            return TrolieClient._auth_token_provider
+
         try:
             import auth_token_provider
         except ImportError:
@@ -153,7 +162,8 @@ class TrolieClient:
                 continue
             attr = getattr(auth_token_provider, attr_name)
             if isinstance(attr, type) and issubclass(attr, AuthTokenProvider):
-                return attr()
+                TrolieClient._auth_token_provider = attr()
+                return TrolieClient._auth_token_provider
 
         return None
 
