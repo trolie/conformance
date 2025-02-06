@@ -49,7 +49,7 @@ class TrolieClient:
         self.role = role
         self.__response = None
 
-    def request(self, relative_path, method="GET") -> "TrolieClient":
+    def request(self, relative_path, method="GET") -> TrolieClient:
         self.__trolie_url = TrolieClient.__get_trolie_url(relative_path)
         self.__method = method
         self.__relative_path = relative_path
@@ -57,7 +57,7 @@ class TrolieClient:
             self.__headers["Authorization"] = f"Bearer {self.auth_token}"
         return self.send()
 
-    def send(self) -> "TrolieClient":
+    def send(self) -> TrolieClient:
         self.__response = requests.request(
             method=self.__method,
             url=self.__trolie_url,
@@ -67,19 +67,19 @@ class TrolieClient:
         )
         return self
 
-    def set_body(self, body) -> "TrolieClient":
+    def set_body(self, body) -> TrolieClient:
         self.__body = body
         return self
 
-    def set_header(self, key: Header, value: str) -> "TrolieClient":
+    def set_header(self, key: Header, value: str) -> TrolieClient:
         self.__headers[key] = value
         return self
 
-    def set_query_param(self, key: str, value: str | int) -> "TrolieClient":
+    def set_query_param(self, key: str, value: str | int) -> TrolieClient:
         self.__query_params[key] = value
         return self
 
-    def ensure_empty_request(self) -> "TrolieClient":
+    def ensure_empty_request(self) -> TrolieClient:
         if existing := self.__headers.pop(Header.ContentType, None):
             warning(f"Removing existing Content-Type header: {existing}")
         if self.__body:
