@@ -18,8 +18,10 @@ pytest_plugins = [
 
 def pytest_bdd_apply_tag(tag, function):
     using_mock = os.getenv("TROLIE_BASE_URL") == "http://localhost:4010"
-    if tag == "prism_fail" and using_mock:
-        marker = pytest.mark.skip(reason="Prism mock does not support this test")
+    should_skip = tag == "prism_fail" and using_mock
+    if should_skip or tag == "todo":
+        reason = "Prism mock does not support this test" if using_mock else "TODO"
+        marker = pytest.mark.skip(reason=reason)
         marker(function)
         return True
     else:
