@@ -8,6 +8,7 @@ Feature: Support querying subsets of the available forecasted limits
 
     Background: Authenticated as a Ratings Provider
         Given a TROLIE client that has been authenticated as a Ratings Provider
+        And the Accept header is set to `application/vnd.trolie.forecast-limits-snapshot.v1+json`
 
     @prism_fail
     Scenario Outline: Obtain just forecast limits starting from a given time in the future
@@ -44,7 +45,9 @@ Feature: Support querying subsets of the available forecasted limits
         | monitoring_set_id |
         | default           |
 
-    @todo
-    Scenario: Query forecast limits with resource-id-filter
-        When the client requests forecast limits with resource-id-filter "86753_1_1"
-        Then the response should include forecast limits for the resource id "86753_1_1"
+    Scenario Outline: Query forecast limits with resource-id filter
+        When the client requests forecast limits with resource-id filter <resource_id>
+        Then the response should include forecast limits for the resource id <resource_id>
+        Examples:
+        | resource_id |
+        | 8badf00d    |

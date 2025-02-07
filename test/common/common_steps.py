@@ -11,7 +11,7 @@ def client_authenticated_as_ratings_provider():
 
 
 @given(parsers.parse("the Accept header is set to `{content_type}`"))
-def bad_accept_header(content_type, client):
+def set_accept_header(content_type, client):
     client.set_header(Header.Accept, content_type)
 
 

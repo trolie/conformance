@@ -39,6 +39,12 @@ def forecast_snapshot_request_filter_monitoring_set(monitoring_set_id, client: T
     get_forecast_limits_snapshot(client)
 
 
+@when(parsers.parse("the client requests forecast limits with resource-id filter {resource_id}"))
+def forecast_snapshot_request_filter_resource_id(resource_id, client: TrolieClient):
+    client.set_query_param("resource-id-filter", resource_id)
+    get_forecast_limits_snapshot(client)
+
+
 @then(parsers.parse("the response should only include forecast limits starting at the `offset-period-start` in the server's time zone, i.e., {response_first_period}"))
 def forecast_snapshot_request_first_period_starts_on(response_first_period, client: TrolieClient):
     expected_start = get_todays_iso8601_for(response_first_period)
@@ -78,3 +84,9 @@ def forecast_snapshot_request_monitoring_set_includes(monitoring_set_id, client:
     resources = client.get_json()["snapshot-header"]["power-system-resources"]
     for resource in resources:
         assert resource["resource-id"] in monitoring_sets[monitoring_set_id], f"Failed for resource {resource['resource-id']}"
+
+
+@then(parsers.parse("the response should include forecast limits for the resource id {resource_id}"))
+def forecast_snapshot_contains_requested_resource(resource_id, client: TrolieClient):
+    resources = client.get_json()["snapshot-header"]["power-system-resources"]
+    assert resource_id in [resource["resource-id"] for resource in resources], f"Failed for resource {resource_id}"
