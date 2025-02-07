@@ -32,15 +32,17 @@ Feature: Support querying subsets of the available forecasted limits
         | server_time            | request_last_period  | response_last_period |
         | 06:00:00-05:00         | 09:00:00-06:00       | 10:00:00-05:00       |
 
-    @todo
+    @prism_fail
     Scenario: Query forecast limits with static-only
         When the client requests forecast limits with static-only set to true
         Then the response should include only static forecast limits
 
-    @todo
-    Scenario: Query forecast limits with monitoring-set-filter
-        When the client requests forecast limits with monitoring-set-filter "default"
-        Then the response should include forecast limits for the monitoring set "default"
+    Scenario Outline: Query forecast limits with monitoring-set filter
+        When the client requests forecast limits with monitoring-set filter <monitoring_set_id>
+        Then the response should include forecast limits for the monitoring set <monitoring_set_id>
+        Examples:
+        | monitoring_set_id |
+        | default           |
 
     @todo
     Scenario: Query forecast limits with resource-id-filter

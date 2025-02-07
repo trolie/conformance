@@ -1,5 +1,6 @@
 from pytest_bdd import given, when, then, parsers
 from test.helpers import TrolieClient
+from datetime import datetime, timedelta
 from test.forecasting.forecast_helpers import (
     get_forecast_limits_snapshot,
     get_todays_iso8601_for,
@@ -26,6 +27,18 @@ def forecast_snapshot_request_filter_last_period(request_last_period, client: Tr
     get_forecast_limits_snapshot(client)
 
 
+@when(parsers.parse("the client requests forecast limits with static-only set to true"))
+def forecast_snapshot_request_filter_static_only(client: TrolieClient):
+    client.set_query_param("static-only", "true")
+    get_forecast_limits_snapshot(client)
+
+
+@when(parsers.parse("the client requests forecast limits with monitoring-set filter {monitoring_set_id}"))
+def forecast_snapshot_request_filter_monitoring_set(monitoring_set_id, client: TrolieClient):
+    client.set_query_param("monitoring-set", monitoring_set_id)
+    get_forecast_limits_snapshot(client)
+
+
 @then(parsers.parse("the response should only include forecast limits starting at the `offset-period-start` in the server's time zone, i.e., {response_first_period}"))
 def forecast_snapshot_request_first_period_starts_on(response_first_period, client: TrolieClient):
     expected_start = get_todays_iso8601_for(response_first_period)
@@ -42,3 +55,26 @@ def forecast_snapshot_request_last_period_includes(response_last_period, client:
     targets = ((limits_entry["resource-id"], limits_entry["periods"][-1]["period-end"]) for limits_entry in limits)
     for resource_id, period_end in targets:
         assert expected_end == period_end, f"Failed for resource {resource_id}"
+
+
+@then(parsers.parse("the response should include only static forecast limits"))
+def forecast_snapshot_request_only_static(client: TrolieClient):
+    limits = client.get_json()["limits"]
+    targets = ((limits_entry["resource-id"], limits_entry["periods"]) for limits_entry in limits)
+    for resource_id, periods in targets:
+        for period in periods:
+            # a static-only forecast limit should have a period of at least 2 hours
+            # this is more a heuristic than a guarantee, but it should be true for all static limits
+            start = datetime.fromisoformat(period["period-start"])
+            end = datetime.fromisoformat(period["period-end"])
+            assert (end - start) >= timedelta(hours=2), f"Failed for resource {resource_id}"
+
+
+monitoring_sets = {"default": ["8badf00d"]}
+
+
+@then(parsers.parse("the response should include forecast limits for the monitoring set {monitoring_set_id}"))
+def forecast_snapshot_request_monitoring_set_includes(monitoring_set_id, client: TrolieClient):
+    resources = client.get_json()["snapshot-header"]["power-system-resources"]
+    for resource in resources:
+        assert resource["resource-id"] in monitoring_sets[monitoring_set_id], f"Failed for resource {resource['resource-id']}"
