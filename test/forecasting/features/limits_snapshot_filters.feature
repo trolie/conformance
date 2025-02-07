@@ -23,13 +23,13 @@ Feature: Support querying subsets of the available forecasted limits
     @todo
     Scenario: What to do when `offset-period-start` is in the past?
 
-    @todo
+    @prism_fail
     Scenario Outline: Query forecast limits with period-end
         Given the current wall clock time at the Clearinghouse is today at 11am GMT, i.e., <server_time>
         When the client requests forecast limits with period-end <request_last_period>
         Then the response should include forecast limits up to <response_last_period> in the server's time zone
         Examples:
-        | server_time            | response_last_period | response_last_period |
+        | server_time            | request_last_period  | response_last_period |
         | 06:00:00-05:00         | 09:00:00-06:00       | 10:00:00-05:00       |
 
     @todo
