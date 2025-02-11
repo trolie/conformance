@@ -1,3 +1,4 @@
+@forecasting
 Feature: Provide forecast limits in appropriate formats
 
     As a Clearinghouse Operator

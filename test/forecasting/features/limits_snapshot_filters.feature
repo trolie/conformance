@@ -1,3 +1,4 @@
+@forecasting
 Feature: Support querying subsets of the available forecasted limits
 
     As a Clearinghouse Operator
@@ -45,6 +46,7 @@ Feature: Support querying subsets of the available forecasted limits
         | monitoring_set_id |
         | default           |
 
+    @requires_model
     Scenario Outline: Query forecast limits with resource-id filter
         When the client requests forecast limits with resource-id filter <resource_id>
         Then the response should include forecast limits for the resource id <resource_id>
