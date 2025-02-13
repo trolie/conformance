@@ -12,7 +12,7 @@ Feature: Support querying subsets of the available forecasted limits
         And the Accept header is set to `application/vnd.trolie.forecast-limits-snapshot.v1+json`
 
     @prism_fail
-    Scenario Outline: Obtain just forecast limits starting from a given time in the future
+    Scenario Outline: Query forecast limits with offset-period-start
         Given the current wall clock time at the Clearinghouse is today at 11am GMT, i.e., <server_time>
         When the client requests forecast limits with `offset-period-start` for an hour from then at <request_offset_time>
         Then the response should only include forecast limits starting at the `offset-period-start` in the server's time zone, i.e., <response_first_period> 
@@ -34,11 +34,6 @@ Feature: Support querying subsets of the available forecasted limits
         | server_time            | request_last_period  | response_last_period |
         | 06:00:00-05:00         | 09:00:00-06:00       | 10:00:00-05:00       |
 
-    @prism_fail
-    Scenario: Query forecast limits with static-only
-        When the client requests forecast limits with static-only set to true
-        Then the response should include only static forecast limits
-
     Scenario Outline: Query forecast limits with monitoring-set filter
         When the client requests forecast limits with monitoring-set filter <monitoring_set_id>
         Then the response should include forecast limits for the monitoring set <monitoring_set_id>
@@ -53,3 +48,8 @@ Feature: Support querying subsets of the available forecasted limits
         Examples:
         | resource_id |
         | 8badf00d    |
+
+    @prism_fail
+    Scenario: Query forecast limits with static-only
+        When the client requests forecast limits with static-only set to true
+        Then the response should include only static forecast limits
