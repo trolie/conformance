@@ -15,6 +15,11 @@ def set_accept_header(content_type, client):
     client.set_header(Header.Accept, content_type)
 
 
+@given(parsers.parse("the Accept-Encoding header is set to `{compression_type}`"))
+def set_accept_encoding_header(compression_type, client):
+    client.set_header(Header.Accept_Encoding, compression_type)
+
+
 @given("the client has bad query parameters")
 def bad_query_parameters(client: TrolieClient):
     client.set_query_param("bad", "value")

@@ -25,6 +25,7 @@ class Role(_CaseMatchingStrEnum):
 class Header(_CaseMatchingStrEnum):
     Authorization = auto()
     Accept = auto()
+    Accept_Encoding = "Accept-Encoding"
     ContentType = "Content-Type"
 
 
@@ -37,15 +38,11 @@ class TrolieClient:
     def __init__(self, role: Role):
         auth_token = TrolieClient.__get_auth_token(role)
         if auth_token is None and role != Role.UNAUTHENTICATED:
-            raise ValueError(
-                f"Failed to obtain Authentication token required for role {role}"
-            )
+            raise ValueError(f"Failed to obtain Authentication token required for role {role}")
         self.auth_token = auth_token
         self.__headers = {}
         if role != Role.UNAUTHENTICATED:
-            self.__headers["X-TROLIE-Testing-Identity"] = (
-                TrolieClient.__get_testing_identity(role)
-            )
+            self.__headers["X-TROLIE-Testing-Identity"] = TrolieClient.__get_testing_identity(role)
         self.__body = None
         self.__method = None
         self.__trolie_url = None
@@ -194,10 +191,7 @@ class MediaType:
     def __eq__(self, other):
         if not isinstance(other, MediaType):
             return NotImplemented
-        return (
-            self.contentType == other.contentType
-            and self.parameters == other.parameters
-        )
+        return self.contentType == other.contentType and self.parameters == other.parameters
 
     @staticmethod
     def from_string(media_type_str: str) -> "MediaType":
@@ -242,9 +236,7 @@ class TrolieMessage:
         with open("openapi.yaml") as f:
             openapi_spec = yaml.safe_load(f)
         schema = TrolieMessage.get_response_schema(response, openapi_spec)
-        rooted_schemas = {
-            "components": {"schemas": openapi_spec["components"]["schemas"]}
-        }
+        rooted_schemas = {"components": {"schemas": openapi_spec["components"]["schemas"]}}
         ref_resolver = jsonschema.RefResolver.from_schema(rooted_schemas)
         validator = OAS30Validator(schema, resolver=ref_resolver)
         try:
@@ -269,9 +261,7 @@ class TrolieMessage:
         return _d
 
     @staticmethod
-    def get_response_schema(
-        response: TrolieClient.ResponseInfo, openapi_spec: dict
-    ) -> dict:
+    def get_response_schema(response: TrolieClient.ResponseInfo, openapi_spec: dict) -> dict:
         content_info_path = [
             "paths",
             response.relative_path,
@@ -292,8 +282,4 @@ class TrolieMessage:
 def get_period(hours=0):
     tz_name = os.getenv("TZ", "UTC")
     timezone = pytz.timezone(tz_name)
-    return (
-        (datetime.now(timezone) + timedelta(hours=hours))
-        .replace(minute=0, second=0, microsecond=0)
-        .isoformat()
-    )
+    return (datetime.now(timezone) + timedelta(hours=hours)).replace(minute=0, second=0, microsecond=0).isoformat()
