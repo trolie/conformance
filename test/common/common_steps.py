@@ -1,4 +1,4 @@
-from pytest_bdd import given, then, when, parsers
+from pytest_bdd import given, then, parsers
 from test.helpers import Header, TrolieClient, Role
 
 
@@ -39,6 +39,8 @@ def request_forecast_limits_snapshot(client: TrolieClient):
 @then("the response is 304 Not Modified")
 def request_forecast_limits_snapshot_304(client: TrolieClient):
     assert client.get_status_code() == 304
+    assert client.response_is_empty()
+    assert client.get_response_header(Header.ContentType) is None
 
 
 @then("the response is 400 Bad Request")
@@ -61,7 +63,6 @@ def valid_snapshot(client: TrolieClient):
     assert client.validate_response()
 
 
-@when("the client issues a conditional GET for the same resource")
 def conditional_get(client: TrolieClient):
     client.set_header("If-None-Match", client.get_response_header("ETag"))
     client.send()
@@ -75,8 +76,3 @@ def empty_response(client: TrolieClient):
 @then(parsers.parse("the Content-Type header in the response is `{content_type}`"))
 def content_type_header(content_type, client):
     assert content_type == client.get_response_header(Header.ContentType)
-
-
-@then("there is no Content-Type header in the response")
-def no_content_type_header(content_type, client):
-    assert client.get_response_header(Header.ContentType) is None

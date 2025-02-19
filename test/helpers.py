@@ -27,6 +27,8 @@ class Header(_CaseMatchingStrEnum):
     Accept = auto()
     Accept_Encoding = "Accept-Encoding"
     ContentType = "Content-Type"
+    If_None_Match = "If-None-Match"
+    Set_Server_Time = "X-TROLIE-Testing-Current-DateTime"
 
 
 @runtime_checkable
@@ -74,6 +76,10 @@ class TrolieClient:
 
     def set_header(self, key: Header, value: str) -> TrolieClient:
         self.__headers[key] = value
+        return self
+
+    def set_server_time(self, time: datetime) -> TrolieClient:
+        self.set_header(Header.Set_Server_Time, time)
         return self
 
     def set_query_param(self, key: str, value: str | int) -> TrolieClient:
