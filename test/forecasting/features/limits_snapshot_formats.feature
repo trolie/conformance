@@ -38,6 +38,14 @@ Feature: Provide forecast limits in appropriate formats
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; inputs-used=true; limit-type=apparent-power  |
       # Overall, we need to whitelist the media types supported
       # using a test config and use the blacklist to assert 415 Unsupported Media Type
+  
+  @todo
+  Scenario: Slim media type requires a limit type
+    Given the Accept header is set to `application/vnd.trolie.forecast-limits-snapshot-slim.v1+json`
+    When the client requests the current Forecast Limits Snapshot
+    Then the response is 415 Unsupported Media Type
+    And the Content-Type header in the response is `application/problem+json`
+    And the response is schema-valid
 
   Scenario Outline: Client should be permitted to request `application/problem+json` explicitly
     Given the Accept header is set to `<content_type>, application/problem+json`
