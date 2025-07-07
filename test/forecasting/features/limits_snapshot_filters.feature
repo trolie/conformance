@@ -11,7 +11,9 @@ Feature: Support querying subsets of the available forecasted limits
         Given a TROLIE client that has been authenticated as a Ratings Provider
         And the Accept header is set to `application/vnd.trolie.forecast-limits-snapshot.v1+json`
 
-    @prism_fail
+
+    # Query parameters for : GET Limits Forecast Snapshot
+    @prism_fail 
     Scenario Outline: Query forecast limits with offset-period-start
         Given the current wall clock time at the Clearinghouse is today at 11am GMT, i.e., <server_time>
         When the client requests forecast limits with `offset-period-start` for an hour from then at <request_offset_time>
@@ -22,8 +24,17 @@ Feature: Support querying subsets of the available forecasted limits
         | 06:00:00-05:00        | 06:00:00-06:00      | 07:00:00-05:00        |
         | 05:00:00-06:00        | 07:00:00-05:00      | 06:00:00-06:00        |
     
-    @todo
-    Scenario: What to do when `offset-period-start` is in the past?
+    # New added
+    @prism_fail
+    Scenario Outline: What to do when `offset-period-start` is in the past?    Query forecast limits with offset-period-start that are in the past 
+        Given the current wall clock time at the Clearinghouse is today at 11am GMT, i.e., <server_time>
+        When the client requests forecast limits with `offset-period-start` for an hour from then at <request_offset_time>
+        Then see output <response_first_period>
+
+        Examples:
+        | server_time       | request_offset_time   | response_first_period |
+        | 06:00:00-05:00    | 07:00:00-03:00        | 05:00:00-05:00        |
+        | 05:00:00-06:00    | 04:00:00-06:00        | 04:00:00-06:00        |
 
     @prism_fail
     Scenario Outline: Query forecast limits with period-end
@@ -49,7 +60,103 @@ Feature: Support querying subsets of the available forecasted limits
         | resource_id |
         | 8badf00d    |
 
-    @prism_fail
+    @lep @prism_fail
     Scenario: Query forecast limits with static-only
         When the client requests forecast limits with static-only set to true
+        Then the response should include only static forecast limits
+    
+    # Query parameters for : GET Historical Limits Forecast Snapshot
+    @lep
+    Scenario Outline: Query historical limits forecast snapshots with offset-period-start
+        Given the current wall clock time at the Clearinghouse is today at 11am GMT, i.e., <server_time> 
+        # And the period requested is set to <period_requested>
+        When the client requests historical forecast limits with `offset-period-start` for an hour from then at <request_offset_time>
+        Then the response should only include forecast limits starting at the `offset-period-start` in the server's time zone, i.e., <response_first_period>
+        
+        Examples:
+        | server_time    | period_requested          | request_offset_time  | response_first_period |
+        | 06:00:00-05:00 | 2023-07-12T16:00:00-07:00 | 09:00:00-06:00       | 10:00:00-05:00        |
+
+    @lep
+    Scenario Outline: Query historical limits forecast snapshots with period-end
+        Given the current wall clock time at the Clearinghouse is today at 11am GMT, i.e., <server_time>
+        When the client requests historical forecast limits with period-end <request_last_period> 
+        Then the response should include forecast limits up to <response_last_period> in the server's time zone
+
+        Examples:
+        | server_time | request_last_period | response_last_period |
+        | 06:00:00-05:00 | 06:00:00-06:00      | 07:00:00-05:00        |
+        | 05:00:00-06:00 | 07:00:00-05:00      | 06:00:00-06:00        |
+
+    @lep
+    Scenario Outline: Query historical limits forecast snapshots with monitoring-set
+        When the client requests historical forecast limits with monitoring-set filter <monitoring_set_id>
+        Then the response should include forecast limits for the monitoring set <monitoring_set_id>
+
+        Examples:
+        | monitoring_set_id |
+        | default           |
+    
+    @lep
+    Scenario Outline: Query historical limits forcasting snapshots with resource-id
+        When the client requests historical forecast limits with resource-id filter <resource_id>
+        Then the response should include forecast limits for the resource id <resource_id>
+
+        Examples:
+        | resource_id |
+        | DOUGLAS.T538.1 OUT |
+        | PARKHILL.T5.T5 |
+        | HEARN.34562.1 |
+    
+    @lep
+    Scenario Outline: Query historical limits forcasting snapshots with static-only
+        When the client requests historical forecast limits with static-only set to true
+        Then the response should include only static forecast limits
+
+    # Query parameters for : GET Regional Limits Forecast Snapshot
+    @lep 
+    Scenario Outline: Query regional limits forecast snapshots with offset-period-start
+        Given the current wall clock time at the Clearinghouse is today at 11am GMT, i.e., <server_time>
+        When the client requests regional forecast limits with `offset-period-start` for an hour from then at <request_offset_time>
+        Then the response should only include forecast limits starting at the `offset-period-start` in the server's time zone, i.e., <response_first_period>
+
+        Examples:
+        | server_time    | request_offset_time | response_first_period |
+        | 06:00:00-05:00 | 06:00:00-06:00      | 07:00:00-05:00        |
+        | 05:00:00-06:00 | 07:00:00-05:00      | 06:00:00-06:00        |
+    
+    @lep
+    Scenario Outline: Query regional limits forecast snapshots with period-end
+        Given the current wall clock time at the Clearinghouse is today at 11am GMT, i.e., <server_time>
+        When the client requests regional forecast limits with period-end <request_last_period>
+        Then the response should include forecast limits up to <response_last_period> in the server's time zone
+
+        Examples:
+        | server_time | request_last_period | response_last_period |
+        | 06:00:00-05:00 | 06:00:00-06:00      | 07:00:00-05:00        |
+        | 05:00:00-06:00 | 07:00:00-05:00      | 06:00:00-06:00        |
+    
+    @lep
+    Scenario Outline: Query regional limits forecast snapshots with monitoring-set 
+        When the client requests regional forecast limits with monitoring-set filter <monitoring_set_id>
+        Then the response should include forecast limits for the monitoring set <monitoring_set_id>
+
+        Examples:
+        | monitoring_set_id |
+        | default |
+    
+    @lep
+    Scenario Outline: Query regional limits forecast snapshots with resource-id
+        When the client requests regional forecast limits with resource-id filter <resource_id>
+        Then the response should include forecast limits for the resource id <resource_id>
+
+        Examples:
+        | resource_id |
+        | DOUGLAS.T538.1 OUT |
+        | PARKHILL.T5.T5 |
+        | HEARN.34562.1 |
+
+    @lep
+    Scenario: Query regional limits forecast snapshots with static-only
+        When the client requests regional forecast limits with static-only set to true
         Then the response should include only static forecast limits

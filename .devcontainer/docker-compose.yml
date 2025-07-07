@@ -12,7 +12,7 @@ services:
     network_mode: service:db
 
   prism:
-    image: stoplight/prism:latest
+    image:  stoplight/prism:latest
     restart: unless-stopped
     command: mock -h 0.0.0.0 /workspace/openapi.yaml
     network_mode: service:db

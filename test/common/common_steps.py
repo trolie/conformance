@@ -1,3 +1,4 @@
+import json
 from pytest_bdd import given, then, parsers
 from test.helpers import Header, TrolieClient, Role
 
@@ -19,6 +20,9 @@ def set_accept_header(content_type, client):
 def set_accept_encoding_header(compression_type, client):
     client.set_header(Header.Accept_Encoding, compression_type)
 
+@given(parsers.parse("the Content-type header is set to `{content_type}`"))
+def set_content_header(content_type, client):
+    client.set_header(Header.ContentType, content_type)
 
 @given("the client has bad query parameters")
 def bad_query_parameters(client: TrolieClient):
@@ -28,8 +32,18 @@ def bad_query_parameters(client: TrolieClient):
 @given("the client has a non-empty body")
 def non_empty_body(client: TrolieClient):
     client.set_body({"key": "value"})
-    client.set_header("Content-Type", "application/json")
+    # client.set_header("Content-Type", "application/json")
 
+# New Added 
+@given(parsers.parse("the body is loaded from `{filename}`"))
+def set_body_from_file(client, filename):
+    with open(filename, "r") as f:
+        body = json.load(f)
+    client.set_body(body)
+
+@then("the response is 202 OK")
+def request_forecast_limits_snapshot(client: TrolieClient):
+    assert client.get_status_code() == 202
 
 @then("the response is 200 OK")
 def request_forecast_limits_snapshot(client: TrolieClient):
@@ -60,7 +74,7 @@ def request_forecast_limits_snapshot_406(client: TrolieClient):
 
 @then("the response is schema-valid")
 def valid_snapshot(client: TrolieClient):
-    assert client.validate_response()
+    assert client.validate_response(), "Schema invalid"
 
 
 def conditional_get(client: TrolieClient):

@@ -1,9 +1,15 @@
 from datetime import datetime
-from test.helpers import TrolieClient
+from test.helpers import TrolieClient, get_period
 
 
 def get_forecast_limits_snapshot(client: TrolieClient):
     return client.request("/limits/forecast-snapshot")
+
+def get_regional_limits_forecast_snapshot(client: TrolieClient):
+    return client.request("/limits/regional/forecast-snapshot")
+
+def get_historical_limits_forecast_snapshot(client: TrolieClient):
+    return client.request(f"/limits/forecast-snapshot/{get_period(-1)}")
 
 
 def get_todays_iso8601_for(time_with_timezone: str) -> str:

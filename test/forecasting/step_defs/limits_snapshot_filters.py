@@ -1,8 +1,11 @@
+import json
 from pytest_bdd import given, when, then, parsers
 from test.helpers import TrolieClient
 from datetime import datetime, timedelta
 from test.forecasting.forecast_helpers import (
     get_forecast_limits_snapshot,
+    get_historical_limits_forecast_snapshot,
+    get_regional_limits_forecast_snapshot,
     get_todays_iso8601_for,
 )
 
@@ -14,6 +17,19 @@ def clearinghouse_wall_clock_today_at_11amGMT(server_time, client: TrolieClient)
         get_todays_iso8601_for(server_time),
     )
 
+@given(parsers.parse("the period requested is set to {period_requested}"))
+def set_historical_forecast_period(period_requested, client: TrolieClient):
+    return client.request(f"limits/forecast-snapshot/{period_requested}")
+    
+@when(parsers.parse("the client requests historical forecast limits with `offset-period-start` for an hour from then at {request_offset_time}"))
+def historical_forecast_snapshot_request_filter_offset_period_start(request_offset_time, client: TrolieClient):
+    client.set_query_param("offset-period-start", get_todays_iso8601_for(request_offset_time))
+    get_historical_limits_forecast_snapshot(client)
+
+@when(parsers.parse("the client requests regional forecast limits with `offset-period-start` for an hour from then at {request_offset_time}"))
+def regional_forcast_snapshot_request_filter_offset_period_start(request_offset_time, client: TrolieClient):
+    client.set_query_param("offset-period-start", get_todays_iso8601_for(request_offset_time))
+    get_regional_limits_forecast_snapshot(client)
 
 @when(parsers.parse("the client requests forecast limits with `offset-period-start` for an hour from then at {request_offset_time}"))
 def forecast_snapshot_request_filter_offset_period_start(request_offset_time, client: TrolieClient):
@@ -26,17 +42,46 @@ def forecast_snapshot_request_filter_last_period(request_last_period, client: Tr
     client.set_query_param("period-end", get_todays_iso8601_for(request_last_period))
     get_forecast_limits_snapshot(client)
 
+@when(parsers.parse("the client requests historical forecast limits with period-end {request_last_period}"))
+def historical_forecast_snapshot_request_filter_last_period(request_last_period, client: TrolieClient):
+    client.set_query_param("period-end", get_todays_iso8601_for(request_last_period))
+    get_historical_limits_forecast_snapshot(client)
+
+@when(parsers.parse("the client requests regional forecast limits with period-end {request_last_period}"))
+def regional_forecast_snapshot_request_filter_last_period(request_last_period, client: TrolieClient):
+    client.set_query_param("period-end", get_todays_iso8601_for(request_last_period))
+    get_regional_limits_forecast_snapshot(client)
+
 
 @when(parsers.parse("the client requests forecast limits with static-only set to true"))
 def forecast_snapshot_request_filter_static_only(client: TrolieClient):
     client.set_query_param("static-only", "true")
     get_forecast_limits_snapshot(client)
 
+@when(parsers.parse("the client requests historical forecast limits with static-only set to true"))
+def historical_snapshot_request_filter_static_only(client: TrolieClient):
+    client.set_query_param("static-only", "true")
+    get_historical_limits_forecast_snapshot(client)
+
+@when(parsers.parse("the client requests regional forecast limits with static-only set to true"))
+def regional_forecast_snapshot_request_filter_static_only(client: TrolieClient):
+    client.set_query_param("static-only", "true")
+    get_regional_limits_forecast_snapshot(client)
 
 @when(parsers.parse("the client requests forecast limits with monitoring-set filter {monitoring_set_id}"))
 def forecast_snapshot_request_filter_monitoring_set(monitoring_set_id, client: TrolieClient):
     client.set_query_param("monitoring-set", monitoring_set_id)
     get_forecast_limits_snapshot(client)
+
+@when(parsers.parse("the client requests historical forecast limits with monitoring-set filter {monitoring_set_id}"))
+def historical_forecast_snapshot_request_filter_monitoring_set(monitoring_set_id, client: TrolieClient):
+    client.set_query_param("monitoring-set", monitoring_set_id)
+    get_historical_limits_forecast_snapshot(client)
+
+@when(parsers.parse("the client requests regional forecast limits with monitoring-set filter {monitoring_set_id}"))
+def regional_forecast_snapshot_request_filter_monitoring_set(monitoring_set_id, client: TrolieClient):
+    client.set_query_param("monitoring-set", monitoring_set_id)
+    get_regional_limits_forecast_snapshot(client)
 
 
 @when(parsers.parse("the client requests forecast limits with resource-id filter {resource_id}"))
@@ -44,6 +89,15 @@ def forecast_snapshot_request_filter_resource_id(resource_id, client: TrolieClie
     client.set_query_param("resource-id-filter", resource_id)
     get_forecast_limits_snapshot(client)
 
+@when(parsers.parse("the client requests historical forecast limits with resource-id filter {resource_id}"))
+def historical_forecast_snapshot_request_filter_resource_id(resource_id, client : TrolieClient):
+    client.set_query_param("resource-id", resource_id)
+    get_historical_limits_forecast_snapshot(client)
+    
+@when(parsers.parse("the client requests regional forecast limits with resource-id filter {resource_id}"))
+def regional_forecast_snapshot_request_filter_resource_id(resource_id, client: TrolieClient):
+    client.set_query_param("resource-id", resource_id)
+    get_regional_limits_forecast_snapshot(client)
 
 @then(parsers.parse("the response should only include forecast limits starting at the `offset-period-start` in the server's time zone, i.e., {response_first_period}"))
 def forecast_snapshot_request_first_period_starts_on(response_first_period, client: TrolieClient):
@@ -90,3 +144,16 @@ def forecast_snapshot_request_monitoring_set_includes(monitoring_set_id, client:
 def forecast_snapshot_contains_requested_resource(resource_id, client: TrolieClient):
     resources = client.get_json()["snapshot-header"]["power-system-resources"]
     assert resource_id in [resource["resource-id"] for resource in resources], f"Failed for resource {resource_id}"
+
+#todo
+@then(parsers.parse("see output {response_first_period}"))
+def forecase_snapshot_request_past_period(response_first_period, client: TrolieClient):
+    expected_start = get_todays_iso8601_for(response_first_period)
+    print("Expected value: ", expected_start)
+    limits = client.get_json()["limits"]
+    print(limits)
+    targets = ((entry["resource-id"], entry["periods"][0]["period-start"]) for entry in limits)
+    for resource_id, period_start in targets:
+        assert expected_start == period_start, f"Failed for resource {resource_id}"
+
+

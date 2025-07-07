@@ -48,3 +48,37 @@ def pytest_bdd_after_scenario(request, feature, scenario):
 
         if client.get_status_code() >= 200 and client.get_status_code() < 300:
             assert client.get_response_header("ETag")
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """Add a pretty summary of test results at the end of the pytest run."""
+    passed = len(terminalreporter.stats.get('passed', []))
+    failed = len(terminalreporter.stats.get('failed', []))
+    skipped = len(terminalreporter.stats.get('skipped', []))
+    deselected = len(terminalreporter.stats.get('deselected', []))
+    warnings = len(terminalreporter.stats.get('warnings', []))
+
+    terminalreporter.write('\n')
+    terminalreporter.write('==================== 🧪 Test Results Summary ====================\n', bold=True)
+    terminalreporter.write(f'  ✅ Passed:      ', bold=True)
+    terminalreporter.write(f'{passed}\n', green=True, bold=True)
+    terminalreporter.write(f'  ❌ Failed:      ', bold=True)
+    terminalreporter.write(f'{failed}\n', red=True, bold=True)
+    terminalreporter.write(f'  ⚠️ Skipped:     ', bold=True)
+    terminalreporter.write(f'{skipped}\n', yellow=True, bold=True)
+    terminalreporter.write(f'  🚫 Deselected:  ', bold=True)
+    terminalreporter.write(f'{deselected}\n', yellow=True)
+    terminalreporter.write(f'  ⚠️ Warnings:    ', bold=True)
+    terminalreporter.write(f'{warnings}\n', yellow=True)
+    # List out passed and failed tests
+    if passed:
+        terminalreporter.write(f'\n  ✅ Passed Tests:\n', green=True, bold=True)
+        for rep in terminalreporter.stats.get('passed', []):
+            if hasattr(rep, 'nodeid'):
+                terminalreporter.write(f'    - {rep.nodeid}\n', green=True)
+    if failed:
+        terminalreporter.write(f'\n  ❌ Failed Tests:\n', red=True, bold=True)
+        for rep in terminalreporter.stats.get('failed', []):
+            if hasattr(rep, 'nodeid'):
+                terminalreporter.write(f'    - {rep.nodeid}\n', red=True)
+    terminalreporter.write('===============================================================\n', bold=True)

@@ -24,7 +24,6 @@ def forecast_proposal_id():
 def request_historical_forecast_limits_snapshot(client: TrolieClient):
     return client.request(f"/limits/forecast-snapshot/{get_period(-1)}")
 
-
 @when("the client requests a Regional Forecast Limits Snapshot")
 def request_regional_forecast_limits_snapshot(client: TrolieClient):
     return client.request("/limits/regional/forecast-snapshot")

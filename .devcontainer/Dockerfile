@@ -4,6 +4,7 @@ SHELL ["/bin/bash", "-c"]
 
 ENV PYTHONUNBUFFERED=1
 
+
 # ensure that any user provided certificates are installed
 ARG cert_path=/usr/local/share/ca-certificates/extra 
 RUN --mount=type=bind,target=/mnt \
@@ -20,8 +21,14 @@ RUN --mount=type=bind,target=/mnt \
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y reinstall --no-install-recommends ca-certificates software-properties-common \
-    && pip install --upgrade pip \
-    && pip install ipykernel jupyter
+    && pip install --upgrade pip --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
+    && pip install ipykernel jupyter --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org
 
-ADD https://raw.githack.com/stoplightio/prism/master/install /tmp/prism-install
-RUN chmod +x /tmp/prism-install && /tmp/prism-install
+#orignal
+# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+# && apt-get -y reinstall --no-install-recommends ca-certificates software-properties-common \
+# && pip install --upgrade pip \
+# && pip install ipykernel jupyter
+
+ADD https://github.com/stoplightio/prism/releases/download/v5.14.2/prism-cli-linux /usr/local/bin/prism
+RUN chmod +x /usr/local/bin/prism 
