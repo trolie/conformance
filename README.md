@@ -72,7 +72,7 @@ only serves static examples. The majority of the conformance suite will require
 a concrete implementation that has loaded the testing model described in the
 Test Data section.
 
-There are to initial steps needs to run tests against a TROLIE implementation: configuring the environment and implementing authorization.
+There are two initial steps needs to run tests against a TROLIE implementation: configuring the environment and implementing authorization.
 
 ##### Step #4.1: Configuring the Environment
 
