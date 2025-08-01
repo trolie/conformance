@@ -1,3 +1,4 @@
+import json
 from pytest_bdd import given, then, parsers
 from test.helpers import Header, TrolieClient, Role
 
@@ -19,6 +20,9 @@ def set_accept_header(content_type, client):
 def set_accept_encoding_header(compression_type, client):
     client.set_header(Header.Accept_Encoding, compression_type)
 
+@given(parsers.parse("the Content-type header is set to `{request_type}`"))
+def set_content_header(request_type, client):
+    client.set_header(Header.ContentType, request_type)
 
 @given("the client has bad query parameters")
 def bad_query_parameters(client: TrolieClient):
@@ -30,6 +34,20 @@ def non_empty_body(client: TrolieClient):
     client.set_body({"key": "value"})
     client.set_header("Content-Type", "application/json")
 
+@given(parsers.parse("the body is loaded from `{filename}`"))
+def set_body_from_file(client: TrolieClient, filename):
+    with open(filename, "r") as f:
+        body = json.load(f)
+    client.set_body(body)
+
+@given(parsers.parse("the request body is a valid {request_type}"))
+def validate_request_body(client: TrolieClient, request_type):
+    # todo
+    return
+
+@then("the response is 202 OK")
+def request_forecast_limits_snapshot(client: TrolieClient):
+    assert client.get_status_code() == 202
 
 @then("the response is 200 OK")
 def request_forecast_limits_snapshot(client: TrolieClient):
@@ -60,7 +78,7 @@ def request_forecast_limits_snapshot_406(client: TrolieClient):
 
 @then("the response is schema-valid")
 def valid_snapshot(client: TrolieClient):
-    assert client.validate_response()
+    assert client.validate_response(), "Schema invalid"
 
 
 def conditional_get(client: TrolieClient):
@@ -73,6 +91,6 @@ def empty_response(client: TrolieClient):
     assert client.response_is_empty()
 
 
-@then(parsers.parse("the Content-Type header in the response is `{content_type}`"))
+@then(parsers.parse("the Content-Type header of the response is `{content_type}`"))
 def content_type_header(content_type, client):
     assert content_type == client.get_response_header(Header.ContentType)
