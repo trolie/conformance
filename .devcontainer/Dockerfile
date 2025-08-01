@@ -5,18 +5,18 @@ SHELL ["/bin/bash", "-c"]
 ENV PYTHONUNBUFFERED=1
 
 # ensure that any user provided certificates are installed
-ARG cert_path=/usr/local/share/ca-certificates/extra
+ENV CERT_PATH=/usr/local/share/ca-certificates/extra
 RUN --mount=type=bind,target=/mnt \
-  mkdir -p $cert_path && \
-  find /mnt/.devcontainer -maxdepth 1 -type f -name '*.crt' -exec install -D -t $cert_path {} \;
+  mkdir -p $CERT_PATH && \
+  find /mnt/.devcontainer -maxdepth 1 -type f -name '*.crt' -exec install -D -t $CERT_PATH {} \;
 
 # ensure vscode server and python can use the user provided certificates
-RUN shopt -s nullglob; certs=($cert_path/*.crt); if [ ${#certs[@]} -gt 0 ]; then cat "${certs[@]}" > "$cert_path/extra_ca_certs"; fi
-RUN echo <<EOF >> /etc/bash.bashrc
-if [ -f "$cert_path/extra_ca_certs" ]; then
-  export SSL_CERT_FILE="$cert_path/extra_ca_certs"
-  export REQUESTS_CA_BUNDLE="$cert_path/extra_ca_certs"
-  export NODE_EXTRA_CA_CERTS="$cert_path/extra_ca_certs"
+RUN shopt -s nullglob; certs=($CERT_PATH/*.crt); if [ ${#certs[@]} -gt 0 ]; then cat "${certs[@]}" > "$CERT_PATH/extra_ca_certs"; fi
+RUN <<EOF cat >> /etc/bash.bashrc
+if [ -f "${CERT_PATH}/extra_ca_certs" ]; then
+  export SSL_CERT_FILE="${CERT_PATH}/extra_ca_certs"
+  export REQUESTS_CA_BUNDLE=\$SSL_CERT_FILE
+  export NODE_EXTRA_CA_CERTS=\$SSL_CERT_FILE
 fi
 EOF
 RUN . /etc/bash.bashrc
