@@ -10,6 +10,7 @@ Feature: Caching of Forecast Limits Snapshots supporting conditional GET
     Background: Authenticated as a Ratings Provider
         Given a TROLIE client that has been authenticated as a Ratings Provider
 
+    # prism_fail: Prism does not implement ETag generation or If-None-Match conditional GET logic; it always returns 200 OK with the full response
     @prism_fail
     Scenario Outline: Support Conditional GET
         Given the Accept header is set to `<accept_header>`
@@ -28,6 +29,7 @@ Feature: Caching of Forecast Limits Snapshots supporting conditional GET
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power, inputs-used=true |
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; inputs-used=true, limit-type=apparent-power  |
 
+    # prism_fail: Prism does not generate ETags, so different representations cannot be verified to have distinct ETags
     @prism_fail
     Scenario Outline: Different representations have different ETags
         Given the Accept header is set to `<accept_header_1>`
@@ -47,6 +49,7 @@ Feature: Caching of Forecast Limits Snapshots supporting conditional GET
         Then the server should respond with a 200 OK status code
         And the response should be schema valid
 
+    # prism_fail: Prism always serves a static example response; data never changes so ETags cannot be verified to change on update
     @prism_fail
     Scenario Outline: ETag changes when data is updated
         Given the Accept header is set to `<content_type>`

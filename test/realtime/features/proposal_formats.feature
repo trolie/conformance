@@ -23,6 +23,8 @@ Feature: Provide real-time proposals in appropriate formats
         | application/vnd.trolie.rating-realtime-proposal-status.v1+json |
     
     # POST Submit Real-Time Rating Proposal
+    # prism_fail: Prism does not have an example response for this POST endpoint and returns 404 or an incorrect response
+    @prism_fail
     Scenario Outline: Submit real-time rating proposal
         Given the Accept header is set to `<content_type>`
         And the real-time rating proposal is generated
