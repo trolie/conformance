@@ -170,8 +170,9 @@ class TrolieClient:
 
         try:
             from test import auth_token_provider
-        except ImportError as e: 
+        except ImportError as e:
             warning(f"ImportError when importing auth_token_provider: {e}")
+            return None
 
         for attr_name in dir(auth_token_provider):
             if attr_name == "AuthTokenProvider":

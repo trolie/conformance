@@ -25,7 +25,8 @@ RUN . /etc/bash.bashrc
 RUN --mount=type=bind,target=/mnt \
   find /mnt/.devcontainer -maxdepth 1 -type f -name 'pip.conf' -exec install -D {} /etc \;
 
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+RUN rm -f /etc/apt/sources.list.d/yarn.list \
+  && apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y reinstall --no-install-recommends ca-certificates software-properties-common \
     && pip install --upgrade pip \
     && pip install ipykernel jupyter

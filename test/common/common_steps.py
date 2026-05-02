@@ -96,3 +96,16 @@ def empty_response(client: TrolieClient):
 @then(parsers.parse("the Content-Type header of the response is `{content_type}`"))
 def content_type_header(content_type, client):
     assert content_type == client.get_response_header(Header.ContentType)
+
+
+@then(parsers.parse("the Content-Type header in the response is `{content_type}`"))
+def content_type_in_response(content_type, client: TrolieClient):
+    actual = client.get_response_header(Header.ContentType)
+    assert actual is not None, "Expected Content-Type header but none was returned"
+
+    def normalize(ct: str) -> str:
+        return ";".join(part.strip() for part in ct.split(";"))
+
+    assert normalize(actual) == normalize(content_type), (
+        f"Expected Content-Type '{content_type}' but got '{actual}'"
+    )

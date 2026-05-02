@@ -43,6 +43,8 @@ Feature: Support querying subsets of the available forecasted limits
         | 5             |
         | 7             |
 
+    @prism_fail  
+    Scenario Outline: Query forecast limits with period-end respects server time zone
         Given the current wall clock time at the Clearinghouse is today at 11am GMT, i.e., <server_time>
         When the client requests forecast limits with period-end <request_last_period>
         Then the response should include forecast limits up to <response_last_period> in the server's time zone
