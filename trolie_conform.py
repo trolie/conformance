@@ -160,7 +160,11 @@ class ProfileResults:
 
     @property
     def conformant(self) -> bool:
-        return len(self.failed) == 0 and len(self.results) > 0
+        return len(self.failed) == 0 and len(self.skipped) == 0 and len(self.results) > 0
+
+    @property
+    def partial(self) -> bool:
+        return len(self.failed) == 0 and len(self.skipped) > 0 and len(self.results) > 0
 
 
 # ── pytest plugin ──────────────────────────────────────────────────────────────
@@ -236,10 +240,11 @@ class _ConformancePlugin:
             if profile_key and profile_key in PROFILES
             else "(unknown)"
         )
-        if profile_key not in self._progress_started:
+        dot_key = profile_key or "(unknown)"
+        if dot_key not in self._progress_started:
             sep = "\n" if self._progress_started else ""
             print(f"{sep}  {_C.BOLD}{label:<28}{_C.RESET}", end="", flush=True)
-            self._progress_started.add(profile_key)
+            self._progress_started.add(dot_key)
 
         if outcome == "passed":
             print(f"{_C.GREEN}.{_C.RESET}", end="", flush=True)
@@ -334,6 +339,8 @@ def _print_report(
         verdict = (
             f"{_C.B_GREEN}CONFORMANT{_C.RESET}"
             if profile.conformant
+            else f"{_C.YELLOW}PARTIAL CONFORMANCE{_C.RESET}"
+            if profile.partial
             else f"{_C.B_RED}NON-CONFORMANT{_C.RESET}"
         )
         print(f"{_C.BOLD}{profile.label}{_C.RESET}  {verdict}")
@@ -383,10 +390,13 @@ def _print_report(
         print()
 
     # ── Overall summary ────────────────────────────────────────────────────────
-    all_conformant = overall_fail == 0 and any_tested
+    all_conformant = overall_fail == 0 and overall_skip == 0 and any_tested
+    any_partial = overall_fail == 0 and overall_skip > 0 and any_tested
     verdict = (
         f"{_C.B_GREEN}CONFORMANT{_C.RESET}"
         if all_conformant
+        else f"{_C.YELLOW}PARTIAL CONFORMANCE{_C.RESET}"
+        if any_partial
         else f"{_C.B_RED}NON-CONFORMANT{_C.RESET}"
     )
     print(_rule("═"))
@@ -399,7 +409,7 @@ def _print_report(
     print(_rule("═"))
     print()
 
-    return 0 if all_conformant else 1
+    return 0 if all_conformant else 1  # both partial and non-conformant exit 1
 
 
 # ── CLI ────────────────────────────────────────────────────────────────────────
