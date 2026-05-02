@@ -111,6 +111,9 @@ class TrolieClient:
     def response_is_empty(self) -> bool:
         return len(self.__response.content) == 0
 
+    def get_server_time(self): 
+        return self.__headers["X-TROLIE-Testing-Current-DateTime"]
+
     @dataclass
     class ResponseInfo:
         verb: str
