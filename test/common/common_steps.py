@@ -68,6 +68,11 @@ def request_forecast_limits_snapshot_400(client: TrolieClient):
     assert client.get_status_code() == 400
 
 
+@then("the response is 422 Unprocessable Entity")
+def response_is_422(client: TrolieClient):
+    assert client.get_status_code() == 422
+
+
 @then("the response is 415 Unsupported Media Type")
 def request_forecast_limits_snapshot_415(client: TrolieClient):
     assert client.get_status_code() == 415

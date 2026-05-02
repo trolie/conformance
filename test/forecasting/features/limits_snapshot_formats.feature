@@ -136,13 +136,11 @@ Feature: Provide forecast limits in appropriate formats
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power, inputs-used=true |
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; inputs-used=true, limit-type=apparent-power  |
   
-  # prism_fail: Prism returns 422 instead of 400 when a GET request contains a body, due to request body validation in the updated spec
-  @prism_fail
   Scenario Outline: Sending a body with a GET request is a bad request 
     Given the Accept header is set to `<content_type>`
     And the client has a non-empty body
     When the client requests the current Forecast Limits Snapshot
-    Then the response is 400 Bad Request
+    Then the response is 422 Unprocessable Entity
     And the Content-Type header in the response is `application/problem+json`
     And the response is schema-valid
     Examples:
@@ -163,7 +161,7 @@ Feature: Provide forecast limits in appropriate formats
       | content_type |
       | application/json |
       | application/vnd.trolie.realtime-limits-snapshot.v1+json |
-      # Prism returns 200, incorrectly, for the following @prism_fail
+      # prism_fail returns 200, incorrectly, for the following
       #| */* |
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json, limit-type=apparent-power |
       #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; inputs-used=true; limit-type=apparent-power  |
