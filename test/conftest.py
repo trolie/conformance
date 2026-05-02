@@ -3,16 +3,32 @@ import pytest
 
 from test.helpers import Role, TrolieClient
 
-from glob import glob
-
 pytest_plugins = [
     "test.common.common_steps",
-    "test.forecasting.step_defs",
-    "test.realtime.step_defs",
-    "test.seasonal.step_defs",
-    "test.seasonal_overrides.step_defs",
-    "test.temporary_aar_exceptions.step_defs",
-    "test.monitoring_sets.step_defs",
+    # forecasting
+    "test.forecasting.step_defs.limits_snapshot_caching",
+    "test.forecasting.step_defs.limits_snapshot_filters",
+    "test.forecasting.step_defs.limits_snapshot_formats",
+    "test.forecasting.step_defs.require_authentication",
+    # realtime
+    "test.realtime.step_defs.proposal_formats",
+    "test.realtime.step_defs.limits_snapshot_formats",
+    "test.realtime.step_defs.limits_snapshot_caching",
+    "test.realtime.step_defs.limits_snapshot_filters",
+    "test.realtime.step_defs.require_authentication",
+    # seasonal
+    "test.seasonal.step_defs.rating_snapshot",
+    "test.seasonal.step_defs.proposal_formats",
+    "test.seasonal.step_defs.caching",
+    # seasonal_overrides
+    "test.seasonal_overrides.step_defs.crud",
+    "test.seasonal_overrides.step_defs.caching",
+    # temporary_aar_exceptions
+    "test.temporary_aar_exceptions.step_defs.crud",
+    "test.temporary_aar_exceptions.step_defs.caching",
+    # monitoring_sets
+    "test.monitoring_sets.step_defs.crud",
+    "test.monitoring_sets.step_defs.caching",
 ]
 
 
@@ -34,7 +50,7 @@ def pytest_bdd_after_scenario(request, feature, scenario):
     if "skip_rate_limiting" in feature.tags or "skip_rate_limiting" in scenario.tags:
         return
     client: TrolieClient = request.getfixturevalue("client")
-    if not getattr(client, "response", None):
+    if not client.has_response():
         return
     if not request.session.shouldfail:
         if os.getenv("RATE_LIMITING"):
@@ -69,12 +85,12 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     summary_lines.append(f'  🚫 Deselected:  {deselected}\n')
     summary_lines.append(f'  ⚠️ Warnings:    {warnings}\n')
     if passed:
-        summary_lines.append(f'\n  ✅ Passed Tests:\n')
+        summary_lines.append('\n  ✅ Passed Tests:\n')
         for rep in terminalreporter.stats.get('passed', []):
             if hasattr(rep, 'nodeid'):
                 summary_lines.append(f'    - {rep.nodeid}\n')
     if failed:
-        summary_lines.append(f'\n  ❌ Failed Tests:\n')
+        summary_lines.append('\n  ❌ Failed Tests:\n')
         for rep in terminalreporter.stats.get('failed', []):
             if hasattr(rep, 'nodeid'):
                 summary_lines.append(f'    - {rep.nodeid}\n')

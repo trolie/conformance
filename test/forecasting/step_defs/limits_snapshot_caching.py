@@ -49,7 +49,6 @@ def new_forecast_available(client):
 
 
 @then("the previous ETag should not match the new ETag")
-def previous_etag_should_not_match_new_etag(client):
+def previous_etag_should_not_match_new_etag(client, etag):
     new_etag = get_etag(client)
-    previous_etag = client.get_header(Header.If_None_Match)
-    assert previous_etag != new_etag, "ETags should not match for different representations"
+    assert etag != new_etag, "ETags should not match for different representations"

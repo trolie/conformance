@@ -1,5 +1,4 @@
-import uuid
-from pytest_bdd import given, when, then
+from pytest_bdd import given, when
 from test.helpers import TrolieClient
 
 _PLACEHOLDER_ID = "placeholder-id"
@@ -7,7 +6,7 @@ _PLACEHOLDER_ID = "placeholder-id"
 
 @given("a Seasonal Override id which may or may not exist", target_fixture="override_id")
 def seasonal_override_id():
-    return str(uuid.uuid4())
+    return _PLACEHOLDER_ID
 
 
 @when("the client requests the list of Seasonal Overrides")

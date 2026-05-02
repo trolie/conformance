@@ -1,4 +1,3 @@
-import json
 from pytest_bdd import given, when, then, parsers
 from dateutil import parser
 from test.helpers import TrolieClient
@@ -18,14 +17,10 @@ def set_clearinghouse_time_to_user_time(client: TrolieClient):
 
 @given(parsers.parse("the period requested is set to {period_requested}"))
 def set_historical_forecast_period(period_requested, client: TrolieClient):
-    return client.request(f"limits/forecast-snapshot/{period_requested}")
-
-@given(parsers.parse("the period requested is set to {period_requested}"))
-def set_historical_forecast_period(period_requested, client: TrolieClient):
-    return client.request(f"limits/forecast-snapshot/{period_requested}")
+    return client.request(f"/limits/forecast-snapshot/{period_requested}")
     
 @when(parsers.parse("the client requests historical forecast limits with `offset-period-start` for an hour from then at {request_offset_time}"))
-def historical_forecast_snapshot_request_filter_offset_period_start(request_offset_time, client: TrolieClient):
+def historical_forecast_snapshot_request_filter_offset_period_start_at(request_offset_time, client: TrolieClient):
     client.set_query_param("offset-period-start", get_todays_iso8601_for(request_offset_time))
     get_historical_limits_forecast_snapshot(client)
 

@@ -1,4 +1,4 @@
-from pytest_bdd import given, when
+from pytest_bdd import when
 from test.helpers import TrolieClient
 
 @when("the client requests for the current real-time snapshot")

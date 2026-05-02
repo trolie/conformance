@@ -1,4 +1,3 @@
-import uuid
 from pytest_bdd import when
 from test.helpers import TrolieClient
 

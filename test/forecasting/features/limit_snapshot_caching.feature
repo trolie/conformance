@@ -73,10 +73,22 @@ Feature: Caching of Forecast Limits Snapshots supporting conditional GET
             | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json                           |
             | application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false          |
             | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |
+
+    # prism_fail: Prism does not implement ETag generation or If-None-Match conditional GET logic; it always returns 200 OK with the full response
+    @prism_fail
+    Scenario Outline: Support Conditional GET for Regional Forecast Limits Snapshot
         Given the Accept header is set to `<accept_header>`
-        When the client requests the Forecast Limits Snapshot with an unknown If-None-Match header
-        Then the server should respond with a 200 OK status code
-        And the response should be schema valid
+        And the client has obtained the current Regional Forecast Limits Snapshot with an ETag
+        When the client immediately issues a conditional GET for the same resource
+        Then the response is 304 Not Modified
+        And the response is empty
+
+        Examples:
+            | accept_header                                                                              |
+            | application/vnd.trolie.forecast-limits-snapshot.v1+json                                    |
+            | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json                           |
+            | application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false          |
+            | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |
 
     # prism_fail: Prism always serves a static example response; data never changes so ETags cannot be verified to change on update
     @prism_fail

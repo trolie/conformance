@@ -20,10 +20,6 @@ def set_accept_header(content_type, client):
 def set_accept_encoding_header(compression_type, client):
     client.set_header(Header.Accept_Encoding, compression_type)
 
-@given(parsers.parse("the Content-type header is set to `{request_type}`"))
-def set_content_header(request_type, client):
-    client.set_header(Header.ContentType, request_type)
-
 @given(parsers.parse("the Content-type header is set to `{content_type}`"))
 def set_content_header(content_type, client):
     client.set_header(Header.ContentType, content_type)
@@ -45,16 +41,12 @@ def set_body_from_file(client: TrolieClient, filename):
     client.set_body(body)
 
 @then("the response is 202 OK")
-def request_forecast_limits_snapshot(client: TrolieClient):
+def response_is_202(client: TrolieClient):
     assert client.get_status_code() == 202
 
 @then("the response is 200 OK")
-def request_forecast_limits_snapshot(client: TrolieClient):
+def response_is_200(client: TrolieClient):
     assert client.get_status_code() == 200
-
-@then("the response is 202 OK")
-def response_is_202(client: TrolieClient):
-    assert client.get_status_code() == 202
 
 @then("the response is 304 Not Modified")
 def request_forecast_limits_snapshot_304(client: TrolieClient):
@@ -101,11 +93,6 @@ def response_is_204(client: TrolieClient):
 @then("the response is schema-valid")
 def valid_snapshot(client: TrolieClient):
     assert client.validate_response(), "Schema invalid"
-
-
-def conditional_get(client: TrolieClient):
-    client.set_header("If-None-Match", client.get_response_header("ETag"))
-    client.send()
 
 
 @then("the response is empty")

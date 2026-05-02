@@ -61,14 +61,18 @@ class TrolieClient:
             self.__headers["Authorization"] = f"Bearer {self.auth_token}"
         return self.send()
 
+    def has_response(self) -> bool:
+        return self.__response is not None
+
     def send(self) -> TrolieClient:
+        verify_ssl = os.getenv("TROLIE_VERIFY_SSL", "false").lower() != "false"
         self.__response = requests.request(
             method=self.__method,
             url=self.__trolie_url,
             headers=self.__headers,
             params=self.__query_params,
             json=self.__body,
-            verify=False,  # Disable SSL verification for testing purposes
+            verify=verify_ssl,
         )
         return self
 
@@ -146,6 +150,7 @@ class TrolieClient:
             return None
         if role == Role.RATINGS_PROVIDER:
             return "TO1"
+        raise ValueError(f"No testing identity configured for role: {role}")
 
     def __get_auth_token(role: Role) -> Optional[str]:
         if role == Role.UNAUTHENTICATED:
@@ -210,11 +215,11 @@ class MediaType:
         parts = media_type_str.split(";")
         contentType = parts[0].strip()
         parameters = {}
-        if len(parts) > 1:
-            param_str = parts[1].strip()
-            for param in param_str.split(","):
-                key, value = param.strip().split("=")
-                parameters[key] = value
+        for param in parts[1:]:
+            param = param.strip()
+            if "=" in param:
+                key, value = param.split("=", 1)
+                parameters[key.strip()] = value.strip()
         return MediaType(contentType=contentType, parameters=parameters)
 
 
@@ -242,11 +247,21 @@ media_types = load_media_types_from_yaml("openapi.yaml")
 MediaTypes = Enum("MediaTypes", media_types)
 
 
+_openapi_spec_cache: dict | None = None
+
+
+def _load_openapi_spec() -> dict:
+    global _openapi_spec_cache
+    if _openapi_spec_cache is None:
+        with open("openapi.yaml") as f:
+            _openapi_spec_cache = yaml.safe_load(f)
+    return _openapi_spec_cache
+
+
 class TrolieMessage:
     @staticmethod
     def is_valid(response: TrolieClient.ResponseInfo) -> bool:
-        with open("openapi.yaml") as f:
-            openapi_spec = yaml.safe_load(f)
+        openapi_spec = _load_openapi_spec()
         schema = TrolieMessage.get_response_schema(response, openapi_spec)
         rooted_schemas = {"components": {"schemas": openapi_spec["components"]["schemas"]}}
         ref_resolver = jsonschema.RefResolver.from_schema(rooted_schemas)

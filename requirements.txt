@@ -1,6 +1,7 @@
 pytest-bdd==7.3.0
 pytest-env
 pytz
+python-dateutil
 pre-commit
 ruff
 jsonschema==4.23.0
