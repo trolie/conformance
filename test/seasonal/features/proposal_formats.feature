@@ -1,0 +1,35 @@
+@seasonal
+Feature: Provide seasonal proposal formats
+
+    As a Clearinghouse Operator
+    I want to provide seasonal proposal status and accept proposals in a variety of formats
+    when a client sends the appropriate media type
+    So that clients can obtain and submit seasonal ratings data
+
+  Background: Authenticated as a Ratings Provider
+    Given a TROLIE client that has been authenticated as a Ratings Provider
+
+  # GET Obtain Seasonal Rating Proposal Status
+  Scenario Outline: Get the seasonal rating proposal status
+    Given the Accept header is set to `<content_type>`
+    When the client requests the Seasonal Rating Proposal Status
+    Then the response is 200 OK
+    And the Content-Type header in the response is `<content_type>`
+    And the response is schema-valid
+
+    Examples:
+    | content_type |
+    | application/vnd.trolie.seasonal-ratings-proposal-status.v1+json |
+
+  # PATCH Submit a Seasonal Ratings Proposal
+  Scenario Outline: Submit a seasonal ratings proposal
+    Given the Content-type header is set to `<request_type>`
+    And the body is loaded from `<file_name>`
+    When the client submits a Seasonal Ratings Proposal
+    Then the response is 202 OK
+    And the Content-Type header in the response is `<response_type>`
+    And the response is schema-valid
+
+    Examples:
+    | request_type                                              | file_name                    | response_type |
+    | application/vnd.trolie.seasonal-ratings-proposal.v1+json | data/seasonal_proposal.json  | application/vnd.trolie.seasonal-ratings-proposal-status.v1+json |

@@ -10,6 +10,9 @@ pytest_plugins = [
     "test.forecasting.step_defs",
     "test.realtime.step_defs",
     "test.seasonal.step_defs",
+    "test.seasonal_overrides.step_defs",
+    "test.temporary_aar_exceptions.step_defs",
+    "test.monitoring_sets.step_defs",
 ]
 
 
