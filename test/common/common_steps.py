@@ -83,6 +83,21 @@ def request_forecast_limits_snapshot_406(client: TrolieClient):
     assert client.get_status_code() == 406
 
 
+@then("the response is 409 Conflict")
+def response_is_409(client: TrolieClient):
+    assert client.get_status_code() == 409
+
+
+@then("the response is 201 Created")
+def response_is_201(client: TrolieClient):
+    assert client.get_status_code() == 201
+
+
+@then("the response is 204 No Content")
+def response_is_204(client: TrolieClient):
+    assert client.get_status_code() == 204
+
+
 @then("the response is schema-valid")
 def valid_snapshot(client: TrolieClient):
     assert client.validate_response(), "Schema invalid"

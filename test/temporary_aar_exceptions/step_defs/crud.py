@@ -25,6 +25,12 @@ def delete_temporary_aar_exception(client: TrolieClient):
     return client.request(f"/temporary-aar-exceptions/{_PLACEHOLDER_ID}", method="DELETE")
 
 
+@when("the client deletes a Temporary AAR Exception that is in use")
+def delete_temporary_aar_exception_in_use(client: TrolieClient):
+    # A real server would reject deletion of an in-use exception with 409
+    return client.request(f"/temporary-aar-exceptions/{_PLACEHOLDER_ID}", method="DELETE")
+
+
 @when("the client updates a Temporary AAR Exception by id")
 def update_temporary_aar_exception(client: TrolieClient):
     return client.request(f"/temporary-aar-exceptions/{_PLACEHOLDER_ID}", method="PUT")

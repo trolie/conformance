@@ -30,16 +30,12 @@ def delete_seasonal_override(client: TrolieClient):
     return client.request(f"/seasonal-overrides/{_PLACEHOLDER_ID}", method="DELETE")
 
 
+@when("the client deletes a Seasonal Override that is in use")
+def delete_seasonal_override_in_use(client: TrolieClient):
+    # A real server would reject deletion of an in-use override with 409
+    return client.request(f"/seasonal-overrides/{_PLACEHOLDER_ID}", method="DELETE")
+
+
 @when("the client updates a Seasonal Override by id")
 def update_seasonal_override(client: TrolieClient):
     return client.request(f"/seasonal-overrides/{_PLACEHOLDER_ID}", method="PUT")
-
-
-@then("the response is 201 Created")
-def response_is_201(client: TrolieClient):
-    assert client.get_status_code() == 201
-
-
-@then("the response is 204 No Content")
-def response_is_204(client: TrolieClient):
-    assert client.get_status_code() == 204

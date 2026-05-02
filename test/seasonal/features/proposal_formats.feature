@@ -33,3 +33,17 @@ Feature: Provide seasonal proposal formats
     Examples:
     | request_type                                              | file_name                    | response_type |
     | application/vnd.trolie.seasonal-ratings-proposal.v1+json | data/seasonal_proposal.json  | application/vnd.trolie.seasonal-ratings-proposal-status.v1+json |
+
+  # prism_fail: Prism returns 422 when submitting the slim proposal format (request body schema validation rejects it)
+  @prism_fail
+  Scenario Outline: Submit a seasonal ratings proposal (slim format)
+    Given the Content-type header is set to `<request_type>`
+    And the body is loaded from `<file_name>`
+    When the client submits a Seasonal Ratings Proposal
+    Then the response is 202 OK
+    And the Content-Type header in the response is `<response_type>`
+    And the response is schema-valid
+
+    Examples:
+    | request_type                                                                            | file_name                        | response_type |
+    | application/vnd.trolie.seasonal-ratings-proposal-slim.v1+json; limit-type=apparent-power | data/seasonal_proposal_slim.json | application/vnd.trolie.seasonal-ratings-proposal-status.v1+json |

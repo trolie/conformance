@@ -21,7 +21,7 @@ Feature: Temporary AAR Exception CRUD operations
     | application/vnd.trolie.temporary-aar-exception-set.v1+json |
 
   # POST /temporary-aar-exceptions
-  # prism_fail: Prism does not have an example response for this POST endpoint
+  # prism_fail: Prism returns 422 for POST with a body (schema validation issue)
   @prism_fail
   Scenario Outline: Create a temporary AAR exception
     Given the Content-type header is set to `<request_type>`
@@ -32,12 +32,10 @@ Feature: Temporary AAR Exception CRUD operations
     And the response is schema-valid
 
     Examples:
-    | request_type                                                           | file_name                              | response_type |
-    | application/vnd.trolie.temporary-aar-exception-request.v1+json        | data/temporary_aar_exception.json      | application/vnd.trolie.temporary-aar-exception.v1+json |
+    | request_type                                                    | file_name                         | response_type |
+    | application/vnd.trolie.temporary-aar-exception.v1+json | data/temporary_aar_exception.json | application/vnd.trolie.temporary-aar-exception.v1+json |
 
   # GET /temporary-aar-exceptions/{id}
-  # prism_fail: Prism does not have an example for this GET-by-id endpoint
-  @prism_fail
   Scenario Outline: Get a temporary AAR exception by id
     Given the Accept header is set to `<content_type>`
     When the client requests a Temporary AAR Exception by id
@@ -59,8 +57,8 @@ Feature: Temporary AAR Exception CRUD operations
     Then the response is 204 No Content
 
     Examples:
-    | request_type                                                    | file_name |
-    | application/vnd.trolie.temporary-aar-exception-request.v1+json | data/temporary_aar_exception.json |
+    | request_type                                           | file_name |
+    | application/vnd.trolie.temporary-aar-exception.v1+json | data/temporary_aar_exception.json |
 
   # DELETE /temporary-aar-exceptions/{id}
   # prism_fail: Prism does not have an example response for DELETE endpoints
@@ -68,3 +66,11 @@ Feature: Temporary AAR Exception CRUD operations
   Scenario: Delete a temporary AAR exception
     When the client deletes a Temporary AAR Exception by id
     Then the response is 204 No Content
+
+  # prism_fail: Prism cannot be instructed to return 409 for a DELETE; requires a real server
+  @prism_fail
+  Scenario: Cannot delete a temporary AAR exception that is in use
+    When the client deletes a Temporary AAR Exception that is in use
+    Then the response is 409 Conflict
+    And the Content-Type header in the response is `application/problem+json`
+    And the response is schema-valid

@@ -38,8 +38,6 @@ Feature: Monitoring Set CRUD operations
     | application/vnd.trolie.monitoring-set-request.v1+json | data/monitoring_set_request.json | application/vnd.trolie.monitoring-set.v2+json |
 
   # GET /monitoring-sets/{id}
-  # prism_fail: Prism does not have an example for this GET-by-id endpoint
-  @prism_fail
   Scenario Outline: Get a monitoring set by id
     Given the Accept header is set to `<content_type>`
     When the client requests a Monitoring Set by id
