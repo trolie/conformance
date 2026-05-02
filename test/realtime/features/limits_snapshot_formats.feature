@@ -69,5 +69,28 @@ Feature: Provide real-time limits in appropriate formats
         | application/vnd.trolie.realtime-limits-detailed-snapshot.v1+json |
         | application/vnd.trolie.realtime-limits-detailed-snapshot.v1+json; include-psr-header=false |
 
-       
+    Scenario Outline: Media types are required for real-time snapshot
+        Given the Accept header is set to `<content_type>`
+        When the client requests for the current real-time snapshot
+        Then the response is 406 Not Acceptable
+        And the Content-Type header in the response is `application/problem+json`
+        And the response is schema-valid
+
+        Examples:
+        | content_type |
+        | application/json |
+        | application/vnd.trolie.forecast-limits-snapshot.v1+json |
+
+    Scenario Outline: Media types are required for regional real-time snapshot
+        Given the Accept header is set to `<content_type>`
+        When the client requests for the current regional real-time snapshot
+        Then the response is 406 Not Acceptable
+        And the Content-Type header in the response is `application/problem+json`
+        And the response is schema-valid
+
+        Examples:
+        | content_type |
+        | application/json |
+        | application/vnd.trolie.forecast-limits-snapshot.v1+json |
+
 

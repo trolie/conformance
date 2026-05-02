@@ -19,6 +19,7 @@ Feature: Monitoring Set CRUD operations
     Examples:
     | content_type |
     | application/vnd.trolie.monitoring-set.v1+json |
+    | application/vnd.trolie.monitoring-set.v2+json |
 
   # POST /monitoring-sets
   # prism_fail: Prism does not have an example response for this POST endpoint
@@ -32,8 +33,9 @@ Feature: Monitoring Set CRUD operations
     And the response is schema-valid
 
     Examples:
-    | request_type                                         | file_name                       | response_type |
+    | request_type                                          | file_name                        | response_type |
     | application/vnd.trolie.monitoring-set-request.v1+json | data/monitoring_set_request.json | application/vnd.trolie.monitoring-set.v1+json |
+    | application/vnd.trolie.monitoring-set-request.v1+json | data/monitoring_set_request.json | application/vnd.trolie.monitoring-set.v2+json |
 
   # GET /monitoring-sets/{id}
   # prism_fail: Prism does not have an example for this GET-by-id endpoint
@@ -48,6 +50,7 @@ Feature: Monitoring Set CRUD operations
     Examples:
     | content_type |
     | application/vnd.trolie.monitoring-set.v1+json |
+    | application/vnd.trolie.monitoring-set.v2+json |
 
   # PUT /monitoring-sets/{id}
   # prism_fail: Prism does not have an example response for PUT endpoints

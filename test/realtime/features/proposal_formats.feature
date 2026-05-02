@@ -26,16 +26,14 @@ Feature: Provide real-time proposals in appropriate formats
     # prism_fail: Prism does not have an example response for this POST endpoint and returns 404 or an incorrect response
     @prism_fail
     Scenario Outline: Submit real-time rating proposal
-        Given the Accept header is set to `<content_type>`
-        And the real-time rating proposal is generated
+        Given the Content-type header is set to `<request_type>`
+        And the body is loaded from `data/realtime_proposal.json`
         When the client submits a real-time rating proposal
         Then the response is 202 OK
-        And the Content-Type header in the response is `<content_type>`
+        And the Content-Type header in the response is `application/vnd.trolie.rating-realtime-proposal-status.v1+json`
         And the response is schema-valid
 
         Examples:
-        | content_type |
+        | request_type |
         | application/vnd.trolie.rating-realtime-proposal.v1+json |
-        | application/vnd.trolie.rating-realtime-proposal-slim.v1+json; limit-type=apparent-power |
-
 
