@@ -1,3 +1,4 @@
+@seasonal
 Feature: Provide seasonal limits in appropriate formats
 
     As a Clearinghouse Operator

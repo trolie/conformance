@@ -35,4 +35,17 @@ Feature: Provide forecast proposal limits in appropriate formats
     Examples: 
     | request_type                                          | file_name                   | response_type |
     | application/vnd.trolie.rating-forecast-proposal.v1+json | data/forecast_proposal.json | application/vnd.trolie.rating-forecast-proposal-status.v1+json |
-    | application/vnd.trolie.rating-forecast-proposal-slim.v1+json; limit-type=apparent-power | data/forecast_proposal_slim.json |
+
+  # prism_fail: Prism returns 422 when submitting the slim proposal format (request body schema validation rejects it)
+  @prism_fail
+  Scenario Outline: Submit a forecast proposal (slim format)
+    Given the Content-type header is set to `<request_type>`
+    And the body is loaded from `<file_name>` 
+    When the client submits a Forecast Proposal
+    Then the response is 202 OK 
+    And the Content-Type header of the response is `<response_type>`
+    And the response is schema-valid
+
+    Examples:
+    | request_type                                                                              | file_name                        | response_type |
+    | application/vnd.trolie.rating-forecast-proposal-slim.v1+json; limit-type=apparent-power | data/forecast_proposal_slim.json | application/vnd.trolie.rating-forecast-proposal-status.v1+json |
