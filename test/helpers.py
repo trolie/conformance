@@ -5,6 +5,7 @@ from enum import Enum, StrEnum, auto
 from logging import info, warning
 from typing import Optional, Protocol, runtime_checkable
 import jsonschema
+import re
 import requests
 import os
 import pytz
@@ -258,6 +259,20 @@ class TrolieMessage:
         return True
 
     @staticmethod
+    def _resolve_path_template(paths: dict, relative_path: str) -> str:
+        """Return the openapi path template that matches the given concrete path."""
+        if relative_path in paths:
+            return relative_path
+        for template in paths:
+            # Split on path parameter placeholders, escape each literal segment,
+            # then join with a segment-matching pattern.
+            parts = re.split(r'\{[^}]+\}', template)
+            pattern = '[^/]+'.join(re.escape(p) for p in parts)
+            if re.fullmatch(pattern, relative_path):
+                return template
+        return relative_path
+
+    @staticmethod
     def _safe_get(d, keys):
         _d = d.copy()
         for key in keys:
@@ -273,9 +288,12 @@ class TrolieMessage:
 
     @staticmethod
     def get_response_schema(response: TrolieClient.ResponseInfo, openapi_spec: dict) -> dict:
+        template_path = TrolieMessage._resolve_path_template(
+            openapi_spec.get("paths", {}), response.relative_path
+        )
         content_info_path = [
             "paths",
-            response.relative_path,
+            template_path,
             response.verb.lower(),
             "responses",
             response.status_code,

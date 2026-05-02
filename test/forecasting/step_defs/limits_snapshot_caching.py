@@ -1,6 +1,6 @@
 from datetime import timedelta
 from pytest_bdd import given, when, then, parsers
-from test.forecasting.forecast_helpers import get_forecast_limits_snapshot, get_todays_iso8601_for, get_etag
+from test.forecasting.forecast_helpers import get_forecast_limits_snapshot, get_historical_limits_forecast_snapshot, get_regional_limits_forecast_snapshot, get_todays_iso8601_for, get_etag
 from test.helpers import Header
 
 base_time = get_todays_iso8601_for("11:00:00Z")
@@ -10,6 +10,18 @@ base_time = get_todays_iso8601_for("11:00:00Z")
 def get_etag_for_forecast_limits_snapshot(client):
     client.set_server_time(base_time)
     return get_etag(get_forecast_limits_snapshot(client))
+
+
+@given("the client has obtained the current Historical Forecast Limits Snapshot with an ETag", target_fixture="etag")
+def get_etag_for_historical_forecast_limits_snapshot(client):
+    client.set_server_time(base_time)
+    return get_etag(get_historical_limits_forecast_snapshot(client))
+
+
+@given("the client has obtained the current Regional Forecast Limits Snapshot with an ETag", target_fixture="etag")
+def get_etag_for_regional_forecast_limits_snapshot(client):
+    client.set_server_time(base_time)
+    return get_etag(get_regional_limits_forecast_snapshot(client))
 
 
 @when("the client immediately issues a conditional GET for the same resource")
