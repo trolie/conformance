@@ -108,3 +108,15 @@ TBD
 * Fixed incorrect content types (-request.v1+json → .v1+json) and false @prism_fail tags on GET-by-id endpoints
 * Moved shared step definitions (201 Created, 204 No Content) to common_steps.py
 * 88 tests pass against the Prism mock; 107 are correctly skipped (@prism_fail) for behaviors Prism can't simulate
+
+
+## Running the Conformance Suite
+
+```shell
+python trolie_conform.py                                        # all profiles, default mock
+python trolie_conform.py --url https://trolie.example.com --token MY_TOKEN
+python trolie_conform.py --profile forecasting --profile realtime
+python trolie_conform.py --url https://... --ssl-verify --hide-skipped
+python trolie_conform.py -v                                     # live progress dots
+```
+
