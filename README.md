@@ -100,3 +100,11 @@ TBD
 ### How do I use this in the CI pipeline of my TROLIE implementation?
 
 TBD
+
+# Recent Status
+
+* All 6 conformance profiles are now covered: Forecasting, Real-Time, Seasonal, Seasonal Overrides, Temporary AAR Exceptions, and Monitoring Sets
+* Added auth scenarios, caching (conditional GET) scenarios, format/406 scenarios, and CRUD scenarios for each profile
+* Fixed incorrect content types (-request.v1+json → .v1+json) and false @prism_fail tags on GET-by-id endpoints
+* Moved shared step definitions (201 Created, 204 No Content) to common_steps.py
+* 88 tests pass against the Prism mock; 107 are correctly skipped (@prism_fail) for behaviors Prism can't simulate
