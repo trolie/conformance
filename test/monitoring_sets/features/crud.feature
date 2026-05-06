@@ -22,8 +22,6 @@ Feature: Monitoring Set CRUD operations
     | application/vnd.trolie.monitoring-set.v2+json |
 
   # POST /monitoring-sets
-  # prism_fail: Prism does not have an example response for this POST endpoint
-  @prism_fail
   Scenario Outline: Create a monitoring set
     Given the Content-type header is set to `<request_type>`
     And the body is loaded from `<file_name>`

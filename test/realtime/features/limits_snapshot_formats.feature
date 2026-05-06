@@ -25,8 +25,6 @@ Feature: Provide real-time limits in appropriate formats
         | application/vnd.trolie.realtime-limits-snapshot-slim.v1+json; limit-type=apparent-power |
         | application/vnd.trolie.realtime-limits-snapshot-slim.v1+json; limit-type=apparent-power; inputs-used=true |
 
-    # prism_fail: Prism only has an example for the base realtime-limits-snapshot media type; it returns the wrong Content-Type for the detailed variant
-    @prism_fail
     Scenario Outline: Get limits real-time snapshot (detailed)
         Given the Accept header is set to `<content_type>`
         When the client requests for the current real-time snapshot
@@ -37,6 +35,18 @@ Feature: Provide real-time limits in appropriate formats
         Examples:
         | content_type |
         | application/vnd.trolie.realtime-limits-detailed-snapshot.v1+json |
+
+    # prism_fail: Prism returns the wrong Content-Type for media type parameter variants
+    @prism_fail
+    Scenario Outline: Get limits real-time snapshot (detailed, include-psr-header=false)
+        Given the Accept header is set to `<content_type>`
+        When the client requests for the current real-time snapshot
+        Then the response is 200 OK
+        And the Content-Type header in the response is `<content_type>`
+        And the response is schema-valid
+
+        Examples:
+        | content_type |
         | application/vnd.trolie.realtime-limits-detailed-snapshot.v1+json; include-psr-header=false |
     
 
@@ -55,8 +65,6 @@ Feature: Provide real-time limits in appropriate formats
         | application/vnd.trolie.realtime-limits-snapshot-slim.v1+json; limit-type=apparent-power |
         | application/vnd.trolie.realtime-limits-snapshot-slim.v1+json; limit-type=apparent-power; inputs-used=true |
 
-    # prism_fail: Prism only has an example for the base realtime-limits-snapshot media type; it returns the wrong Content-Type for the detailed variant
-    @prism_fail
     Scenario Outline: Get regional limits real-time snapshot (detailed)
         Given the Accept header is set to `<content_type>`
         When the client requests for the current regional real-time snapshot
@@ -67,6 +75,18 @@ Feature: Provide real-time limits in appropriate formats
         Examples:
         | content_type |
         | application/vnd.trolie.realtime-limits-detailed-snapshot.v1+json |
+
+    # prism_fail: Prism returns the wrong Content-Type for media type parameter variants
+    @prism_fail
+    Scenario Outline: Get regional limits real-time snapshot (detailed, include-psr-header=false)
+        Given the Accept header is set to `<content_type>`
+        When the client requests for the current regional real-time snapshot
+        Then the response is 200 OK
+        And the Content-Type header in the response is `<content_type>`
+        And the response is schema-valid
+
+        Examples:
+        | content_type |
         | application/vnd.trolie.realtime-limits-detailed-snapshot.v1+json; include-psr-header=false |
 
     Scenario Outline: Media types are required for real-time snapshot

@@ -23,7 +23,6 @@ Feature: Provide forecast limits in appropriate formats
       | application/vnd.trolie.forecast-limits-snapshot.v1+json;include-psr-header=false |
 
   # prism_fail: Prism only has an example for the base forecast-limits-snapshot media type; it returns the wrong Content-Type for the detailed variant
-  @prism_fail
   Scenario Outline: Obtaining the latest detailed forecast snapshot
     Given the Accept header is set to `<content_type>`
     When the client requests the current Forecast Limits Snapshot
@@ -33,6 +32,17 @@ Feature: Provide forecast limits in appropriate formats
     Examples:
       | content_type |
       | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json |
+
+  # prism_fail: Prism returns the wrong Content-Type for media type parameter variants
+  @prism_fail
+  Scenario Outline: Obtaining the latest detailed forecast snapshot (include-psr-header=false)
+    Given the Accept header is set to `<content_type>`
+    When the client requests the current Forecast Limits Snapshot
+    Then the response is 200 OK
+    And the Content-Type header in the response is `<content_type>`
+    And the response is schema-valid
+    Examples:
+      | content_type |
       | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json;include-psr-header=false |
 
   # GET Limits Forecast Snapshot (Slim format)
@@ -45,13 +55,19 @@ Feature: Provide forecast limits in appropriate formats
     Examples:
       | content_type |
       | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power |
-      # TODO: Prism's mock server returns the wrong media type
-      #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power; inputs-used=true |
-      # This literally crashes Prism's mock server
-      #| application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; inputs-used=true; limit-type=apparent-power  |
-      # Overall, we need to whitelist the media types supported
-      # using a test config and use the blacklist to assert 415 Unsupported Media Type
-  
+
+  # prism_fail: Prism's mock server returns the wrong media type for inputs-used=true and crashes on some orderings
+  @prism_fail
+  Scenario Outline: Obtaining the latest slim forecast snapshot (inputs-used)
+    Given the Accept header is set to `<content_type>`
+    When the client requests the current Forecast Limits Snapshot
+    Then the response is 200 OK
+    And the Content-Type header in the response is `<content_type>`
+    And the response is schema-valid
+    Examples:
+      | content_type |
+      | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power; inputs-used=true |
+
   @todo
   Scenario: Slim media type requires a limit type
     Given the Accept header is set to `application/vnd.trolie.forecast-limits-snapshot-slim.v1+json`
@@ -179,8 +195,6 @@ Feature: Provide forecast limits in appropriate formats
       | application/vnd.trolie.forecast-limits-snapshot.v1+json |
       | application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false |
 
-  # prism_fail: Prism only has an example for the base forecast-limits-snapshot media type; it returns the wrong Content-Type for the detailed variant
-  @prism_fail
   Scenario Outline: Get historical limits forecast snapshot (detailed)
     Given the Accept header is set to `<content_type>`
     When the client requests a Historical Forecast Limits Snapshot
@@ -191,6 +205,18 @@ Feature: Provide forecast limits in appropriate formats
     Examples:
       | content_type |
       | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json |
+
+  # prism_fail: Prism returns the wrong Content-Type for media type parameter variants
+  @prism_fail
+  Scenario Outline: Get historical limits forecast snapshot (detailed, include-psr-header=false)
+    Given the Accept header is set to `<content_type>`
+    When the client requests a Historical Forecast Limits Snapshot
+    Then the response is 200 OK
+    And the Content-Type header in the response is `<content_type>`
+    And the response is schema-valid
+
+    Examples:
+      | content_type |
       | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |
 
   Scenario Outline: Get historical limits forecast snapshot (slim)
@@ -203,6 +229,19 @@ Feature: Provide forecast limits in appropriate formats
     Examples:
       | content_type |
       | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power |
+
+  # prism_fail: Prism returns the wrong media type for inputs-used=true
+  @prism_fail
+  Scenario Outline: Get historical limits forecast snapshot (slim, inputs-used)
+    Given the Accept header is set to `<content_type>`
+    When the client requests a Historical Forecast Limits Snapshot
+    Then the response is 200 OK
+    And the Content-Type header in the response is `<content_type>`
+    And the response is schema-valid
+
+    Examples:
+      | content_type |
+      | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power; inputs-used=true |
 
   Scenario Outline: Media types are required for Historical Forecast Limits Snapshot
     Given the Accept header is set to `<content_type>`
@@ -230,8 +269,19 @@ Feature: Provide forecast limits in appropriate formats
     | application/vnd.trolie.forecast-limits-snapshot.v1+json; include-psr-header=false |
     | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power |
 
-  # prism_fail: Prism only has an example for the base media type and returns the wrong Content-Type for the detailed variant
+  # prism_fail: Prism returns the wrong media type for inputs-used=true
   @prism_fail
+  Scenario Outline: Get regional limits forecast snapshot (slim, inputs-used)
+    Given the Accept header is set to `<content_type>`
+    When the client requests a Regional Forecast Limits Snapshot
+    Then the response is 200 OK
+    And the Content-Type header in the response is `<content_type>`
+    And the response is schema-valid
+
+    Examples:
+    | content_type |
+    | application/vnd.trolie.forecast-limits-snapshot-slim.v1+json; limit-type=apparent-power; inputs-used=true |
+
   Scenario Outline: Get regional limits forecast snapshot (detailed)
     Given the Accept header is set to `<content_type>`
     When the client requests a Regional Forecast Limits Snapshot
@@ -242,6 +292,18 @@ Feature: Provide forecast limits in appropriate formats
     Examples:
     | content_type |
     | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json |
+
+  # prism_fail: Prism returns the wrong Content-Type for media type parameter variants
+  @prism_fail
+  Scenario Outline: Get regional limits forecast snapshot (detailed, include-psr-header=false)
+    Given the Accept header is set to `<content_type>`
+    When the client requests a Regional Forecast Limits Snapshot
+    Then the response is 200 OK
+    And the Content-Type header in the response is `<content_type>`
+    And the response is schema-valid
+
+    Examples:
+    | content_type |
     | application/vnd.trolie.forecast-limits-detailed-snapshot.v1+json; include-psr-header=false |
 
   Scenario Outline: Media types are required for Regional Forecast Limits Snapshot
@@ -283,12 +345,23 @@ Feature: Provide forecast limits in appropriate formats
     Then the response is 202 OK
     And the Content-Type header in the response is `<response_type>`
     And the response is schema-valid
-    
-
 
     Examples:
-    | content_type                                                                            | file_name                        | response_type |
-    | application/vnd.trolie.rating-forecast-proposal.v1+json                                 | data/forecast_snapshot.json      | application/vnd.trolie.rating-forecast-proposal-status.v1+json |
-    #| application/vnd.trolie.rating-forecast-proposal-slim.v1+json; limit-type=apparent-power | data/forecast_proposal_slim.json | application/vnd.trolie.rating-forecast-proposal-status.v1+json |
+    | content_type                                            | file_name                   | response_type |
+    | application/vnd.trolie.rating-forecast-proposal.v1+json | data/forecast_snapshot.json | application/vnd.trolie.rating-forecast-proposal-status.v1+json |
+
+  # prism_fail: Prism returns 422 when submitting the slim proposal format (request body schema validation rejects it)
+  @prism_fail
+  Scenario Outline: Update Regional Limits Forecast Snapshot (slim format)
+    Given the Content-type header is set to `<content_type>`
+    And the body is loaded from `<file_name>`
+    When the client submits a Regional Forecast Limits Snapshot
+    Then the response is 202 OK
+    And the Content-Type header in the response is `<response_type>`
+    And the response is schema-valid
+
+    Examples:
+    | content_type                                                                             | file_name                        | response_type |
+    | application/vnd.trolie.rating-forecast-proposal-slim.v1+json; limit-type=apparent-power | data/forecast_proposal_slim.json | application/vnd.trolie.rating-forecast-proposal-status.v1+json |
 
 

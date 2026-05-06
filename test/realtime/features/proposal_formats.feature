@@ -23,8 +23,6 @@ Feature: Provide real-time proposals in appropriate formats
         | application/vnd.trolie.rating-realtime-proposal-status.v1+json |
     
     # POST Submit Real-Time Rating Proposal
-    # prism_fail: Prism does not have an example response for this POST endpoint and returns 404 or an incorrect response
-    @prism_fail
     Scenario Outline: Submit real-time rating proposal
         Given the Content-type header is set to `<request_type>`
         And the body is loaded from `data/realtime_proposal.json`
@@ -36,4 +34,18 @@ Feature: Provide real-time proposals in appropriate formats
         Examples:
         | request_type |
         | application/vnd.trolie.rating-realtime-proposal.v1+json |
+
+    # prism_fail: Prism cannot validate slim Content-Type parameters (same root cause as other include-psr-header=false variants)
+    @prism_fail
+    Scenario Outline: Submit real-time rating proposal (slim format)
+        Given the Content-type header is set to `<request_type>`
+        And the body is loaded from `data/realtime_proposal_slim.json`
+        When the client submits a real-time rating proposal
+        Then the response is 202 OK
+        And the Content-Type header in the response is `application/vnd.trolie.rating-realtime-proposal-status.v1+json`
+        And the response is schema-valid
+
+        Examples:
+        | request_type |
+        | application/vnd.trolie.rating-realtime-proposal-slim.v1+json; limit-type=apparent-power |
 
