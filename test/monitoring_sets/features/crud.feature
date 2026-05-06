@@ -24,6 +24,7 @@ Feature: Monitoring Set CRUD operations
   # POST /monitoring-sets
   Scenario Outline: Create a monitoring set
     Given the Content-type header is set to `<request_type>`
+    And the Accept header is set to `<response_type>`
     And the body is loaded from `<file_name>`
     When the client creates a Monitoring Set
     Then the response is 201 Created
